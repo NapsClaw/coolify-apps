@@ -126,35 +126,46 @@ export default async function Home() {
             <h2 className="font-playfair text-3xl font-bold text-slate-800 mt-2">Livros & <em className="text-blue-600">Publicações</em></h2>
             <div className="w-10 h-1 bg-gradient-to-r from-blue-500 to-green-400 rounded mx-auto mt-3"></div>
           </div>
-          {livros.length === 0 ? (
-            <div className="bg-blue-50 rounded-2xl p-8 text-center">
-              <span className="text-5xl block mb-3">📚</span>
-              <p className="text-slate-600">Entre em contato pelo WhatsApp para adquirir as obras!</p>
-              <a href="https://wa.me/559891416254?text=Olá Delsio! Tenho interesse em suas obras." target="_blank"
-                className="mt-4 inline-block bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition">
-                💬 Falar pelo WhatsApp
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-6 border border-blue-100">
+            <div className="flex gap-5 items-start mb-5">
+              <div className="w-24 h-32 bg-gradient-to-br from-blue-300 to-green-300 rounded-xl flex items-center justify-center flex-shrink-0 text-4xl shadow-md">📖</div>
+              <div>
+                <h3 className="font-playfair font-bold text-slate-800 text-xl mb-2">Poesia em Ebulição</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">Uma obra que transborda emoção, lirismo e profundidade. Versos que tocam a alma e ficam na memória. Disponível em papel e formato digital nas principais plataformas.</p>
+              </div>
+            </div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Onde adquirir:</p>
+            <div className="grid grid-cols-2 gap-2">
+              <a href="https://www.amazon.com.br/Poesia-Ebuli%C3%A7%C3%A3o-Delsio-Jo%C3%A3o-Pavan/dp/6528033552/" target="_blank"
+                className="flex items-center gap-2 bg-white border border-blue-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 transition">
+                <span>📦</span> Amazon (Físico)
+              </a>
+              <a href="https://www.amazon.com.br/Poesia-Ebuli%C3%A7%C3%A3o-Delsio-Jo%C3%A3o-Pavan-ebook/dp/B0G5B6QML3/" target="_blank"
+                className="flex items-center gap-2 bg-white border border-blue-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 transition">
+                <span>📱</span> Amazon (Digital)
+              </a>
+              <a href="https://play.google.com/store/books/details?id=LR6dEQAAQBAJ&gl=br" target="_blank"
+                className="flex items-center gap-2 bg-white border border-blue-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 transition">
+                <span>🎮</span> Google Play
+              </a>
+              <a href="https://books.apple.com/br/book/poesia-em-ebuli%C3%A7%C3%A3o/id6756193027" target="_blank"
+                className="flex items-center gap-2 bg-white border border-blue-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 transition">
+                <span>🍎</span> Apple Books
+              </a>
+              <a href="https://www.kobo.com/br/pt/ebook/poesia-em-ebulicao" target="_blank"
+                className="flex items-center gap-2 bg-white border border-blue-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 transition">
+                <span>📗</span> Kobo
+              </a>
+              <a href="https://www.estantevirtual.com.br/livro/poesia-em-ebulicao-NO6-6219-000-BK" target="_blank"
+                className="flex items-center gap-2 bg-white border border-blue-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 transition">
+                <span>🏪</span> Estante Virtual
+              </a>
+              <a href="https://loja.umlivro.com.br/poesia-em-ebulicao-7465264/p" target="_blank"
+                className="flex items-center gap-2 bg-white border border-blue-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 col-span-2 justify-center transition">
+                <span>📚</span> Um Livro
               </a>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {livros.map((l: any) => (
-                <div key={l.id} className="flex gap-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-5 border border-blue-100">
-                  <div className="w-20 h-28 bg-gradient-to-br from-blue-200 to-green-200 rounded-lg flex items-center justify-center flex-shrink-0 text-3xl">📖</div>
-                  <div className="flex-1">
-                    <h3 className="font-playfair font-bold text-slate-800 text-lg">{l.titulo}</h3>
-                    {l.descricao && <p className="text-sm text-slate-600 mt-1 leading-relaxed">{l.descricao}</p>}
-                    <div className="mt-3 flex items-center gap-3 flex-wrap">
-                      {l.preco > 0 && <span className="font-bold text-blue-700">R$ {Number(l.preco).toFixed(2).replace('.', ',')}</span>}
-                      <a href={`https://wa.me/559891416254?text=Olá! Quero adquirir: ${l.titulo}`} target="_blank"
-                        className="text-sm bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition">
-                        💬 Adquirir
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
