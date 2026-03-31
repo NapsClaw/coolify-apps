@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback } from 'react'
 const API_BASE = ''
 
 const CANDIDATOS = [
-  { id: 'c1', nome: 'Mário Lúcio da Conceição', cargo: 'Candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/mario2.jpg', iniciais: 'MC', cor: '#1a56db' },
-  { id: 'c2', nome: 'Michele Freitas', cargo: 'Candidata a Deputada Estadual — Guarujá, SP', foto: '/fotos/michele.jpg', iniciais: 'MF', cor: '#7c3aed' },
-  { id: 'c3', nome: 'Val Advogado', cargo: 'Candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/val.jpg', iniciais: 'VA', cor: '#0891b2' },
-  { id: 'c4', nome: 'Anderson Bernardes', cargo: 'Candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/anderson.jpg', iniciais: 'AB', cor: '#059669' },
-  { id: 'c5', nome: 'Santiago Ângelo', cargo: 'Candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/santiago.jpg', iniciais: 'SA', cor: '#d97706' },
-  { id: 'c6', nome: 'Adriana Machado', cargo: 'Candidata a Deputada Estadual — Guarujá, SP', foto: '/fotos/adriana.jpg', iniciais: 'AM', cor: '#be185d' },
+  { id: 'c1', nome: 'Mário Lúcio da Conceição', cargo: 'Pré-candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/mario2.jpg', iniciais: 'MC', cor: '#1a56db' },
+  { id: 'c2', nome: 'Michele Freitas', cargo: 'Pré-candidata a Deputada Estadual — Guarujá, SP', foto: '/fotos/michele.jpg', iniciais: 'MF', cor: '#7c3aed' },
+  { id: 'c3', nome: 'Val Advogado', cargo: 'Pré-candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/val.jpg', iniciais: 'VA', cor: '#0891b2' },
+  { id: 'c4', nome: 'Anderson Bernardes', cargo: 'Pré-candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/anderson.jpg', iniciais: 'AB', cor: '#059669' },
+  { id: 'c5', nome: 'Santiago Ângelo', cargo: 'Pré-candidato a Deputado Estadual — Guarujá, SP', foto: '/fotos/santiago.jpg', iniciais: 'SA', cor: '#d97706' },
+  { id: 'c6', nome: 'Adriana Machado', cargo: 'Pré-candidata a Deputada Estadual — Guarujá, SP', foto: '/fotos/adriana.jpg', iniciais: 'AM', cor: '#be185d' },
 ]
 
 interface Resultado {
@@ -101,7 +101,7 @@ export default function VotacaoPage() {
             PESQUISA ELEITORAL 2026
           </div>
           <div style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 22, fontWeight: 900, color: '#0e3d91', lineHeight: 1.2, marginBottom: 8 }}>
-            Deputado Estadual<br />Guarujá, SP
+            Pré-candidatos<br />Deputado Estadual — Guarujá, SP
           </div>
           <div style={{ fontSize: 13, color: '#6b7280' }}>Em quem você votaria?</div>
         </div>
