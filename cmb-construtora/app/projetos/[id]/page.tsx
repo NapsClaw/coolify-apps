@@ -19,24 +19,7 @@ export default async function ProjetoPage({ params }: { params: Promise<{ id: st
   const project = await getProject(id)
 
   if (!project) {
-    // Placeholder for demo
-    const demo = {
-      id,
-      title: 'Residência Alto Padrão',
-      description: 'Casa de 450m² construída do zero em Curitiba, com piscina aquecida, área gourmet com churrasqueira, jardim paisagístico e acabamentos premium. Entregue 15 dias antes do prazo combinado.',
-      category: 'Residencial',
-      location: 'Curitiba, PR',
-      area_m2: 450,
-      year_completed: 2024,
-      status: 'concluido',
-      cover_image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80',
-      images: [
-        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80',
-        'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&q=80',
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80',
-      ],
-    }
-    return <ProjectDetail project={demo} />
+    notFound()
   }
 
   return <ProjectDetail project={project} />
