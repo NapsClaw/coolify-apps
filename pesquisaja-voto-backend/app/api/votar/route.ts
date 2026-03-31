@@ -34,13 +34,13 @@ export async function POST(req: NextRequest) {
     const ip = getIP(req)
 
     // Check if IP already voted
-    const existing = await sql`SELECT id FROM votos WHERE ip = ${ip}`
+    const existing = await sql`SELECT id FROM pesquisaja_votos WHERE ip = ${ip}`
     if (existing.length > 0) {
       return NextResponse.json({ success: false, error: 'ja_votou' }, { status: 409 })
     }
 
     await sql`
-      INSERT INTO votos (ip, candidato, nome)
+      INSERT INTO pesquisaja_votos (ip, candidato, nome)
       VALUES (${ip}, ${candidato}, ${nome.trim()})
     `
 

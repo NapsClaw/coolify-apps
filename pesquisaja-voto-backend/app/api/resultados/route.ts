@@ -3,16 +3,21 @@ import { sql } from '@/lib/db'
 
 export const revalidate = 30 // cache 30s
 
+interface VotoRow {
+  candidato: string
+  total: string
+}
+
 export async function GET() {
   try {
     const rows = await sql`
-      SELECT candidato, COUNT(*) as total
-      FROM votos
+      SELECT candidato, COUNT(*)::text as total
+      FROM pesquisaja_votos
       GROUP BY candidato
       ORDER BY total DESC
-    `
-    const totalVotos = rows.reduce((acc: number, r: { total: string }) => acc + parseInt(r.total), 0)
-    const resultados = rows.map((r: { candidato: string; total: string }) => ({
+    ` as VotoRow[]
+    const totalVotos = rows.reduce((acc: number, r: VotoRow) => acc + parseInt(r.total), 0)
+    const resultados = rows.map((r: VotoRow) => ({
       candidato: r.candidato,
       votos: parseInt(r.total),
       pct: totalVotos > 0 ? Math.round((parseInt(r.total) / totalVotos) * 100) : 0
