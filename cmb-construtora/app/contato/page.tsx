@@ -179,7 +179,7 @@ export default function ContatoPage() {
                     <span className="text-2xl">✉️</span>
                     <div>
                       <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">E-mail</div>
-                      <span className="text-white text-sm">contato@cmbconstrutora.com.br</span>
+                      <span className="text-white text-sm">cmbconstrutoracs@gmail.com</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
