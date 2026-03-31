@@ -62,7 +62,7 @@ export default function ContatoPage() {
                   <p className="text-gray-400">Recebemos sua solicitação. Nossa equipe vai entrar em contato em breve.</p>
                   <button
                     onClick={() => setStatus('idle')}
-                    className="mt-6 bg-brand-yellow text-brand-dark px-6 py-3 rounded font-bold hover:bg-yellow-400 transition-colors"
+                    className="mt-6 bg-brand-yellow text-white px-6 py-3 rounded font-bold hover:bg-brand-accent transition-colors"
                   >
                     Enviar outra mensagem
                   </button>
@@ -155,7 +155,7 @@ export default function ContatoPage() {
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="w-full bg-brand-yellow text-brand-dark py-4 rounded font-bold text-lg hover:bg-yellow-400 transition-colors disabled:opacity-60"
+                    className="w-full bg-brand-yellow text-white py-4 rounded font-bold text-lg hover:bg-brand-accent transition-colors disabled:opacity-60"
                   >
                     {status === 'loading' ? 'Enviando...' : 'Solicitar Orçamento Gratuito'}
                   </button>
@@ -172,7 +172,7 @@ export default function ContatoPage() {
                     <span className="text-2xl">📞</span>
                     <div>
                       <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Telefone / WhatsApp</div>
-                      <a href="https://wa.me/554197743530" className="text-brand-yellow font-medium hover:underline">(41) 9774-3530</a>
+                      <a href="https://wa.me/5544997556422" className="text-brand-yellow font-medium hover:underline">(44) 99755-6422</a>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">

@@ -70,7 +70,7 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-brand-yellow text-brand-dark py-3 rounded font-bold hover:bg-yellow-400 transition-colors disabled:opacity-60"
+            className="w-full bg-brand-yellow text-white py-3 rounded font-bold hover:bg-brand-accent transition-colors disabled:opacity-60"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>

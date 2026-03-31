@@ -55,7 +55,7 @@ export default async function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/contato"
-                  className="bg-brand-yellow text-brand-dark px-8 py-4 rounded font-bold text-lg text-center hover:bg-yellow-400 transition-colors"
+                  className="bg-brand-yellow text-white px-8 py-4 rounded font-bold text-lg text-center hover:bg-brand-accent transition-colors"
                 >
                   Solicitar Orçamento
                 </Link>
@@ -154,7 +154,7 @@ export default async function Home() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       {p.category && (
-                        <span className="absolute top-3 left-3 bg-brand-yellow text-brand-dark text-xs font-bold px-3 py-1 rounded">
+                        <span className="absolute top-3 left-3 bg-brand-yellow text-white text-xs font-bold px-3 py-1 rounded">
                           {p.category}
                         </span>
                       )}
@@ -176,7 +176,7 @@ export default async function Home() {
                     <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-4">
                       <Image src={p.img} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <span className="absolute top-3 left-3 bg-brand-yellow text-brand-dark text-xs font-bold px-3 py-1 rounded">{p.cat}</span>
+                      <span className="absolute top-3 left-3 bg-brand-yellow text-white text-xs font-bold px-3 py-1 rounded">{p.cat}</span>
                     </div>
                     <h3 className="text-white font-bold text-lg mb-1">{p.title}</h3>
                     <p className="text-gray-500 text-sm">{p.loc}</p>

@@ -10,10 +10,11 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          yellow: '#F5A623',
+          yellow: '#2E6DA4',
+          accent: '#1A4A7A',
           dark: '#1A1A1A',
           gray: '#2D2D2D',
-          light: '#F5F5F0',
+          light: '#F0F4F8',
         },
       },
       fontFamily: {

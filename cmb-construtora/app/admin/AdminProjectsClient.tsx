@@ -130,7 +130,7 @@ export default function AdminProjectsClient({
             <h2 className="text-white font-bold text-xl">Projetos</h2>
             <button
               onClick={openNew}
-              className="bg-brand-yellow text-brand-dark px-5 py-2 rounded font-bold text-sm hover:bg-yellow-400 transition-colors"
+              className="bg-brand-yellow text-white px-5 py-2 rounded font-bold text-sm hover:bg-brand-accent transition-colors"
             >
               + Novo Projeto
             </button>
@@ -204,7 +204,7 @@ export default function AdminProjectsClient({
                 </div>
                 <div className="flex gap-3 pt-2">
                   <button type="submit" disabled={loading}
-                    className="bg-brand-yellow text-brand-dark px-6 py-2.5 rounded font-bold text-sm hover:bg-yellow-400 transition-colors disabled:opacity-60">
+                    className="bg-brand-yellow text-white px-6 py-2.5 rounded font-bold text-sm hover:bg-brand-accent transition-colors disabled:opacity-60">
                     {loading ? 'Salvando...' : 'Salvar'}
                   </button>
                   <button type="button" onClick={() => setShowForm(false)}
@@ -231,7 +231,7 @@ export default function AdminProjectsClient({
                       className="object-cover"
                     />
                     {Boolean(p.featured) && (
-                      <span className="absolute top-2 left-2 bg-brand-yellow text-brand-dark text-xs font-bold px-2 py-0.5 rounded">DESTAQUE</span>
+                      <span className="absolute top-2 left-2 bg-brand-yellow text-white text-xs font-bold px-2 py-0.5 rounded">DESTAQUE</span>
                     )}
                   </div>
                   <div className="p-4">

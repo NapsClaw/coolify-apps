@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Footer() {
   return (
@@ -7,8 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-brand-yellow rounded flex items-center justify-center font-black text-brand-dark text-sm">C</div>
-              <span className="font-bold text-white text-lg">CMB<span className="text-brand-yellow"> CONSTRUTORA</span></span>
+              <Image src="/logo.jpg" alt="CMB Construtora" width={56} height={56} className="rounded" />
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Construindo sonhos com qualidade, prazo e transparência há mais de 10 anos.
@@ -30,7 +30,7 @@ export default function Footer() {
                 <svg className="w-4 h-4 text-brand-yellow flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
                 </svg>
-                (41) 9774-3530
+                (44) 99755-6422
               </li>
               <li className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-brand-yellow flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

@@ -74,7 +74,7 @@ export default async function ProjetosPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   {p.category && (
-                    <span className="absolute top-3 left-3 bg-brand-yellow text-brand-dark text-xs font-bold px-3 py-1 rounded">
+                    <span className="absolute top-3 left-3 bg-brand-yellow text-white text-xs font-bold px-3 py-1 rounded">
                       {p.category}
                     </span>
                   )}

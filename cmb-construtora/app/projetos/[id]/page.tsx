@@ -45,7 +45,7 @@ function ProjectDetail({ project }: { project: Record<string, unknown> }) {
           <div className="absolute bottom-8 left-0 right-0 px-4">
             <div className="max-w-6xl mx-auto">
               {project.category ? (
-                <span className="bg-brand-yellow text-brand-dark text-xs font-bold px-3 py-1 rounded mb-3 inline-block">
+                <span className="bg-brand-yellow text-white text-xs font-bold px-3 py-1 rounded mb-3 inline-block">
                   {project.category as string}
                 </span>
               ) : null}
@@ -118,7 +118,7 @@ function ProjectDetail({ project }: { project: Record<string, unknown> }) {
                 </ul>
                 <Link
                   href="/contato"
-                  className="block mt-6 bg-brand-yellow text-brand-dark px-5 py-3 rounded font-bold text-center hover:bg-yellow-400 transition-colors"
+                  className="block mt-6 bg-brand-yellow text-white px-5 py-3 rounded font-bold text-center hover:bg-brand-accent transition-colors"
                 >
                   Quero um projeto assim
                 </Link>
