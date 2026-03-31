@@ -35,8 +35,7 @@ export default async function AdminPage() {
       <header className="bg-brand-gray border-b border-white/10 px-4 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-brand-yellow rounded flex items-center justify-center font-black text-brand-dark text-sm">C</div>
-            <span className="font-bold text-white">CMB <span className="text-brand-yellow">ADMIN</span></span>
+            <span className="font-bold text-white">CMB <span style={{color: '#1E6BB8'}}>ADMIN</span></span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/" className="text-gray-400 hover:text-white text-sm transition-colors">← Ver site</Link>
