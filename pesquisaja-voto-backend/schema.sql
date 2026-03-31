@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS votos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ip VARCHAR(64) NOT NULL,
+  candidato VARCHAR(100) NOT NULL,
+  nome VARCHAR(150) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS votos_ip_unique ON votos(ip);
