@@ -1,7 +1,17 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 
-export const revalidate = 30 // cache 30s
+export const revalidate = 30
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders })
+}
 
 interface VotoRow {
   candidato: string
@@ -22,9 +32,9 @@ export async function GET() {
       votos: parseInt(r.total),
       pct: totalVotos > 0 ? Math.round((parseInt(r.total) / totalVotos) * 100) : 0
     }))
-    return NextResponse.json({ success: true, data: { resultados, total: totalVotos } })
+    return NextResponse.json({ success: true, data: { resultados, total: totalVotos } }, { headers: corsHeaders })
   } catch (err) {
     console.error('Erro ao buscar resultados:', err)
-    return NextResponse.json({ success: false, error: 'Erro interno' }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Erro interno' }, { status: 500, headers: corsHeaders })
   }
 }

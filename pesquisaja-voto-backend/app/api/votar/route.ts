@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders })
+}
+
 const CANDIDATOS_VALIDOS = [
   'Mário Lúcio da Conceição',
   'Michele Freitas',
@@ -25,10 +35,10 @@ export async function POST(req: NextRequest) {
     const { candidato, nome } = body
 
     if (!candidato || !CANDIDATOS_VALIDOS.includes(candidato)) {
-      return NextResponse.json({ success: false, error: 'Candidato inválido' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'Candidato inválido' }, { status: 400, headers: corsHeaders })
     }
     if (!nome || nome.trim().length < 2) {
-      return NextResponse.json({ success: false, error: 'Nome obrigatório' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'Nome obrigatório' }, { status: 400, headers: corsHeaders })
     }
 
     const ip = getIP(req)
@@ -36,7 +46,7 @@ export async function POST(req: NextRequest) {
     // Check if IP already voted
     const existing = await sql`SELECT id FROM pesquisaja_votos WHERE ip = ${ip}`
     if (existing.length > 0) {
-      return NextResponse.json({ success: false, error: 'ja_votou' }, { status: 409 })
+      return NextResponse.json({ success: false, error: 'ja_votou' }, { status: 409, headers: corsHeaders })
     }
 
     await sql`
@@ -44,9 +54,9 @@ export async function POST(req: NextRequest) {
       VALUES (${ip}, ${candidato}, ${nome.trim()})
     `
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true }, { headers: corsHeaders })
   } catch (err) {
     console.error('Erro ao votar:', err)
-    return NextResponse.json({ success: false, error: 'Erro interno' }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Erro interno' }, { status: 500, headers: corsHeaders })
   }
 }
