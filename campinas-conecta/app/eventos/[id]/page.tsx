@@ -6,12 +6,13 @@ import { notFound } from 'next/navigation'
 
 export const revalidate = 60
 
-export default async function EventDetailPage({ params }: { params: { id: string } }) {
+export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const session = await getSession()
 
   const rows = await sql`
     SELECT * FROM events
-    WHERE id = ${params.id}::uuid
+    WHERE id = ${id}::uuid
     LIMIT 1
   `
   const ev = rows[0] as any

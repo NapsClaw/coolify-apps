@@ -6,14 +6,15 @@ import { notFound } from 'next/navigation'
 
 export const revalidate = 60
 
-export default async function BusinessDetailPage({ params }: { params: { id: string } }) {
+export default async function BusinessDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const session = await getSession()
 
   const rows = await sql`
     SELECT b.*, c.name as category_name, c.icon as category_icon
     FROM businesses b
     LEFT JOIN categories c ON c.id = b.category_id
-    WHERE b.id = ${params.id}::uuid AND b.status = 'active'
+    WHERE b.id = ${id}::uuid AND b.status = 'active'
     LIMIT 1
   `
 
