@@ -5,9 +5,9 @@ import Link from 'next/link'
 
 export const revalidate = 60
 
-export default async function EventosPage({ searchParams }: { searchParams: { q?: string } }) {
+export default async function EventosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const session = await getSession()
-  const { q } = searchParams
+  const { q } = await searchParams
 
   const events = await sql`
     SELECT * FROM events

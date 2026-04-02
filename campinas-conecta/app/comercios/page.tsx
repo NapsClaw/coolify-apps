@@ -8,10 +8,10 @@ export const revalidate = 60
 export default async function ComerciosPage({
   searchParams,
 }: {
-  searchParams: { q?: string; categoria?: string }
+  searchParams: Promise<{ q?: string; categoria?: string }>
 }) {
   const session = await getSession()
-  const { q, categoria } = searchParams
+  const { q, categoria } = await searchParams
 
   const businesses = await sql`
     SELECT b.*, c.name as category_name, c.icon as category_icon
