@@ -21,7 +21,7 @@ export async function createSession(userId: string): Promise<string> {
   return token
 }
 
-export async function getSession() {
+export async function getSession(): Promise<SessionUser | null> {
   const cookieStore = await cookies()
   const token = cookieStore.get('session')?.value
   if (!token) return null
@@ -33,7 +33,7 @@ export async function getSession() {
     WHERE s.token = ${token} AND s.expires_at > NOW()
     LIMIT 1
   `
-  return rows[0] || null
+  return (rows[0] as SessionUser) || null
 }
 
 export async function destroySession() {

@@ -3,7 +3,9 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-export default function Navbar({ user }: { user?: { name: string; role: string } | null }) {
+import type { SessionUser } from '@/lib/auth'
+
+export default function Navbar({ user }: { user?: SessionUser | null }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
