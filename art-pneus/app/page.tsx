@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { sql } from '@/lib/db'
 import Image from 'next/image'
 import Link from 'next/link'
 
 async function getGalleryItems() {
   try {
-    const items = await sql`
+    const items = (await sql`
       SELECT * FROM gallery_items
       WHERE active = true
       ORDER BY sort_order ASC, created_at DESC
       LIMIT 20
-    `
+    `) as any[]
     return items
   } catch {
     return []
@@ -18,8 +19,8 @@ async function getGalleryItems() {
 
 async function getSettings() {
   try {
-    const settings = await sql`SELECT key, value FROM site_settings`
-    return Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]))
+    const settings = (await sql`SELECT key, value FROM site_settings`) as any[]
+    return Object.fromEntries(settings.map((s: any) => [s.key, s.value]))
   } catch {
     return {}
   }
@@ -28,8 +29,8 @@ async function getSettings() {
 export default async function Home() {
   const [gallery, settings] = await Promise.all([getGalleryItems(), getSettings()])
   const whatsapp = settings.whatsapp || '556186183026'
-  const images = gallery.filter((item: { media_type: string }) => item.media_type === 'image')
-  const videos = gallery.filter((item: { media_type: string }) => item.media_type === 'video')
+  const images = gallery.filter((item: any) => item.media_type === 'image')
+  const videos = gallery.filter((item: any) => item.media_type === 'video')
 
   return (
     <main className="min-h-screen bg-white">
@@ -111,7 +112,7 @@ export default async function Home() {
           </div>
           {images.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-              {images.map((item: { id: string; media_url: string; title: string; description: string }) => (
+              {images.map((item: any) => (
                 <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden bg-gray-200 shadow-sm hover:shadow-lg transition-all">
                   <Image
                     src={item.media_url}
@@ -146,7 +147,7 @@ export default async function Home() {
               <p className="text-gray-600 text-lg">Assista como criamos nossas peças únicas</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {videos.map((item: { id: string; media_url: string; title: string; thumbnail_url: string }) => (
+              {videos.map((item: any) => (
                 <div key={item.id} className="rounded-xl overflow-hidden shadow-md bg-black">
                   <video
                     src={item.media_url}
