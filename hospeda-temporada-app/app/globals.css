@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+:root {
+  --cream: #F7F2EB;
+  --terra: #AC4747;
+  --terra-dark: #8a3636;
+  --dark: #1a1410;
+  --mid: #5a4f45;
+  --light: #d4c9b8;
+  --white: #ffffff;
+  --green: #22c55e;
+  --red: #ef4444;
+}
+
+@theme inline {
+  --font-sans: var(--font-jakarta);
+  --font-serif: var(--font-playfair);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+  background: var(--cream);
+  color: var(--dark);
+}
