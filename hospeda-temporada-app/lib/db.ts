@@ -55,6 +55,30 @@ async function initDb() {
   await sql`CREATE INDEX IF NOT EXISTS idx_reservations_property ON reservations(property_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_reservations_status ON reservations(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_reservations_dates ON reservations(date_start, date_end)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS pricing_rules (
+      id SERIAL PRIMARY KEY,
+      property_id TEXT NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+      rule_type TEXT NOT NULL,
+      price_per_night INTEGER,
+      weekend_days JSONB DEFAULT '[5,6]',
+      season_start_month INTEGER,
+      season_start_day INTEGER,
+      season_end_month INTEGER,
+      season_end_day INTEGER,
+      date_start DATE,
+      date_end DATE,
+      min_guests INTEGER,
+      price_per_extra_guest INTEGER,
+      label TEXT,
+      priority INTEGER DEFAULT 0,
+      active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_pricing_rules_property ON pricing_rules(property_id)`;
 }
 
 async function ensureDb() {

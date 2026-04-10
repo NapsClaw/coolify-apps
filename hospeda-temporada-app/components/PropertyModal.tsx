@@ -43,6 +43,17 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Pricing
+  const [priceBreakdown, setPriceBreakdown] = useState<{
+    has_dynamic_pricing: boolean;
+    nights?: number;
+    breakdown?: { date: string; label: string; price: number }[];
+    subtotal?: number;
+    guest_surcharge?: { extra_guests: number; per_night: number; total: number } | null;
+    total?: number;
+  } | null>(null);
+  const [priceLoading, setPriceLoading] = useState(false);
+
   // Fetch blocked dates
   useEffect(() => {
     if (!property) return;
@@ -91,6 +102,40 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
     },
     [selectedStart, selectedEnd]
   );
+
+  // Fetch price when dates + guests are selected
+  useEffect(() => {
+    if (!property || !selectedStart || !selectedEnd) {
+      setPriceBreakdown(null);
+      return;
+    }
+    // Parse guest count from range string (e.g., "6-10" → 10)
+    const guestCount = formData.pessoas
+      ? parseInt(formData.pessoas.replace('+', '').split('-').pop() || '1')
+      : 1;
+
+    const timer = setTimeout(async () => {
+      setPriceLoading(true);
+      try {
+        const params = new URLSearchParams({
+          propertyId: property.id,
+          dateStart: selectedStart,
+          dateEnd: selectedEnd,
+          guests: String(guestCount),
+        });
+        const res = await fetch(`/api/pricing/calculate?${params}`);
+        if (res.ok) {
+          setPriceBreakdown(await res.json());
+        }
+      } catch {
+        setPriceBreakdown(null);
+      } finally {
+        setPriceLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [property, selectedStart, selectedEnd, formData.pessoas]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -252,6 +297,42 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
               </span>
             )}
           </div>
+
+          {/* Dynamic price breakdown */}
+          {priceLoading && (
+            <div className="bg-[#F7F2EB] rounded-xl p-4 animate-pulse">
+              <div className="h-4 bg-[#d4c9b8]/40 rounded w-1/2 mb-2" />
+              <div className="h-6 bg-[#d4c9b8]/40 rounded w-1/3" />
+            </div>
+          )}
+          {!priceLoading && priceBreakdown?.has_dynamic_pricing && priceBreakdown.total != null && (
+            <div className="bg-[#F7F2EB] rounded-xl p-4 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="font-sans text-sm text-[#5a4f45]">
+                  {priceBreakdown.nights} {priceBreakdown.nights === 1 ? 'noite' : 'noites'}
+                </span>
+                <span className="font-sans text-sm text-[#1a1410]">
+                  R$ {priceBreakdown.subtotal?.toLocaleString('pt-BR')}
+                </span>
+              </div>
+              {priceBreakdown.guest_surcharge && priceBreakdown.guest_surcharge.total > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="font-sans text-sm text-[#5a4f45]">
+                    +{priceBreakdown.guest_surcharge.extra_guests} hóspedes extras
+                  </span>
+                  <span className="font-sans text-sm text-[#1a1410]">
+                    R$ {priceBreakdown.guest_surcharge.total.toLocaleString('pt-BR')}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2 border-t border-[#d4c9b8]/40">
+                <span className="font-serif text-base font-bold text-[#1a1410]">Total</span>
+                <span className="font-serif text-xl font-bold text-[#AC4747]">
+                  R$ {priceBreakdown.total.toLocaleString('pt-BR')}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Calendar section */}

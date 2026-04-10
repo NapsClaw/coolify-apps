@@ -130,7 +130,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'reservas' | 'calendario' | 'imoveis'>('reservas');
+  const [activeTab, setActiveTab] = useState<'reservas' | 'calendario' | 'imoveis' | 'precos'>('reservas');
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -163,6 +163,32 @@ export default function AdminPage() {
   });
 
   const [actionLoading, setActionLoading] = useState<number | string | null>(null);
+  const [uploadingImages, setUploadingImages] = useState(false);
+
+  // Precos tab
+  interface PricingRuleLocal {
+    id: number;
+    property_id: string;
+    rule_type: string;
+    price_per_night: number | null;
+    weekend_days: number[];
+    season_start_month: number | null;
+    season_start_day: number | null;
+    season_end_month: number | null;
+    season_end_day: number | null;
+    date_start: string | null;
+    date_end: string | null;
+    min_guests: number | null;
+    price_per_extra_guest: number | null;
+    label: string | null;
+    priority: number;
+    active: boolean;
+  }
+  const [pricingProperty, setPricingProperty] = useState('');
+  const [pricingRules, setPricingRules] = useState<PricingRuleLocal[]>([]);
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [pricingMonth, setPricingMonth] = useState(new Date().getMonth());
+  const [pricingYear, setPricingYear] = useState(new Date().getFullYear());
 
   // ─── Auth ───
 
@@ -173,14 +199,20 @@ export default function AdminPage() {
     return '';
   };
 
-  const fetchApi = useCallback(async (url: string, options: RequestInit = {}) => {
+  const fetchApi = useCallback(async (url: string, options: RequestInit & { raw?: boolean } = {}) => {
     const storedPw = getStoredPassword();
+    const { raw, ...fetchOptions } = options;
+    const headers: Record<string, string> = {
+      'x-admin-password': storedPw,
+    };
+    if (!raw) {
+      headers['Content-Type'] = 'application/json';
+    }
     const res = await fetch(url, {
-      ...options,
+      ...fetchOptions,
       headers: {
-        'Content-Type': 'application/json',
-        'x-admin-password': storedPw,
-        ...(options.headers || {}),
+        ...headers,
+        ...(fetchOptions.headers as Record<string, string> || {}),
       },
     });
     if (res.status === 401) {
@@ -290,6 +322,86 @@ export default function AdminPage() {
       loadCalendarReservations(calendarProperty);
     }
   }, [authenticated, activeTab, calendarProperty, loadCalendarReservations]);
+
+  const loadPricingRules = useCallback(async (propId: string) => {
+    if (!propId) { setPricingRules([]); return; }
+    setPricingLoading(true);
+    try {
+      const res = await fetchApi(`/api/pricing?propertyId=${propId}`);
+      if (res.ok) setPricingRules(await res.json());
+    } catch (err) { console.error(err); }
+    finally { setPricingLoading(false); }
+  }, [fetchApi]);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    if (activeTab === 'precos' && pricingProperty) {
+      loadPricingRules(pricingProperty);
+    }
+  }, [authenticated, activeTab, pricingProperty, loadPricingRules]);
+
+  const savePricingRule = async (data: Record<string, unknown>) => {
+    setActionLoading('pricing');
+    try {
+      if (data.id) {
+        await fetchApi('/api/pricing', { method: 'PUT', body: JSON.stringify(data) });
+      } else {
+        await fetchApi('/api/pricing', { method: 'POST', body: JSON.stringify({ ...data, property_id: pricingProperty }) });
+      }
+      await loadPricingRules(pricingProperty);
+    } catch (err) { console.error(err); }
+    finally { setActionLoading(null); }
+  };
+
+  const deletePricingRuleHandler = async (id: number) => {
+    setActionLoading('pricing');
+    try {
+      await fetchApi('/api/pricing', { method: 'DELETE', body: JSON.stringify({ id }) });
+      await loadPricingRules(pricingProperty);
+    } catch (err) { console.error(err); }
+    finally { setActionLoading(null); }
+  };
+
+  // Pricing calendar helper
+  const getPriceForDateLocal = (dateStr: string): { price: number; label: string; type: string } | null => {
+    const baseRule = pricingRules.find(r => r.rule_type === 'base');
+    if (!baseRule?.price_per_night) return null;
+
+    const date = new Date(dateStr + 'T12:00:00');
+    const dayOfWeek = date.getDay();
+    const month = parseInt(dateStr.slice(5, 7));
+    const day = parseInt(dateStr.slice(8, 10));
+
+    // Custom override
+    for (const rule of pricingRules.filter(r => r.rule_type === 'custom' && r.date_start && r.date_end).sort((a, b) => b.priority - a.priority)) {
+      if (dateStr >= rule.date_start! && dateStr <= rule.date_end!) {
+        return { price: rule.price_per_night!, label: rule.label || 'Especial', type: 'custom' };
+      }
+    }
+
+    // Seasonal
+    for (const rule of pricingRules.filter(r => r.rule_type === 'seasonal' && r.season_start_month != null).sort((a, b) => b.priority - a.priority)) {
+      const sm = rule.season_start_month!, sd = rule.season_start_day || 1;
+      const em = rule.season_end_month!, ed = rule.season_end_day || 31;
+      let inSeason = false;
+      if (sm <= em) {
+        inSeason = (month > sm || (month === sm && day >= sd)) && (month < em || (month === em && day <= ed));
+      } else {
+        inSeason = (month > sm || (month === sm && day >= sd)) || (month < em || (month === em && day <= ed));
+      }
+      if (inSeason) {
+        return { price: rule.price_per_night || baseRule.price_per_night, label: rule.label || 'Temporada', type: 'seasonal' };
+      }
+    }
+
+    // Weekend
+    const weekendRule = pricingRules.find(r => r.rule_type === 'weekend');
+    if (weekendRule?.price_per_night && (weekendRule.weekend_days || [5, 6]).includes(dayOfWeek)) {
+      return { price: weekendRule.price_per_night, label: 'Fim de semana', type: 'weekend' };
+    }
+
+    return { price: baseRule.price_per_night, label: 'Base', type: 'base' };
+  };
 
   // ─── Actions ───
 
@@ -677,6 +789,7 @@ export default function AdminPage() {
             {([
               { key: 'reservas' as const, label: 'Reservas', icon: '📋' },
               { key: 'calendario' as const, label: 'Calendário', icon: '📅' },
+              { key: 'precos' as const, label: 'Preços', icon: '💰' },
               { key: 'imoveis' as const, label: 'Imóveis', icon: '🏠' },
             ]).map(tab => (
               <button
@@ -1132,6 +1245,301 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* ─── TAB: PRECOS ─── */}
+        {!loading && activeTab === 'precos' && (
+          <div className="space-y-6">
+            <h2 className="font-serif text-xl font-bold text-[#1a1410]">Gestão de Preços</h2>
+
+            {/* Property selector */}
+            <select
+              value={pricingProperty}
+              onChange={e => setPricingProperty(e.target.value)}
+              className="w-full sm:w-64 px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+            >
+              <option value="">Selecione um imóvel</option>
+              {properties.filter(p => p.active).map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+
+            {pricingProperty && pricingLoading && (
+              <div className="text-center py-8 text-[#5a4f45]">Carregando...</div>
+            )}
+
+            {pricingProperty && !pricingLoading && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left column: Rules */}
+                <div className="space-y-4">
+                  {/* Base price */}
+                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                    <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Preço base</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#5a4f45]">R$</span>
+                      <input
+                        type="number"
+                        value={pricingRules.find(r => r.rule_type === 'base')?.price_per_night || ''}
+                        onChange={e => {
+                          const val = parseInt(e.target.value) || 0;
+                          const existing = pricingRules.find(r => r.rule_type === 'base');
+                          savePricingRule({ id: existing?.id, rule_type: 'base', price_per_night: val });
+                        }}
+                        placeholder="0"
+                        className="w-32 px-3 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                      />
+                      <span className="text-sm text-[#5a4f45]">/ noite</span>
+                    </div>
+                  </div>
+
+                  {/* Weekend price */}
+                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                    <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Fim de semana</h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm text-[#5a4f45]">R$</span>
+                      <input
+                        type="number"
+                        value={pricingRules.find(r => r.rule_type === 'weekend')?.price_per_night || ''}
+                        onChange={e => {
+                          const val = parseInt(e.target.value) || 0;
+                          const existing = pricingRules.find(r => r.rule_type === 'weekend');
+                          savePricingRule({ id: existing?.id, rule_type: 'weekend', price_per_night: val, weekend_days: existing?.weekend_days || [5, 6] });
+                        }}
+                        placeholder="0"
+                        className="w-32 px-3 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                      />
+                      <span className="text-sm text-[#5a4f45]">/ noite</span>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d, i) => {
+                        const weekendRule = pricingRules.find(r => r.rule_type === 'weekend');
+                        const days = weekendRule?.weekend_days || [5, 6];
+                        const checked = days.includes(i);
+                        return (
+                          <label key={i} className="flex items-center gap-1 text-xs text-[#5a4f45]">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => {
+                                const newDays = checked ? days.filter((x: number) => x !== i) : [...days, i];
+                                if (weekendRule) {
+                                  savePricingRule({ id: weekendRule.id, rule_type: 'weekend', price_per_night: weekendRule.price_per_night, weekend_days: newDays });
+                                }
+                              }}
+                              className="rounded border-[#d4c9b8]"
+                            />
+                            {d}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Guest surcharge */}
+                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                    <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Extra por hóspede</h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm text-[#5a4f45]">A partir de</span>
+                      <input
+                        type="number"
+                        value={pricingRules.find(r => r.rule_type === 'guest_surcharge')?.min_guests || ''}
+                        onChange={e => {
+                          const val = parseInt(e.target.value) || 0;
+                          const existing = pricingRules.find(r => r.rule_type === 'guest_surcharge');
+                          savePricingRule({
+                            id: existing?.id, rule_type: 'guest_surcharge',
+                            min_guests: val,
+                            price_per_extra_guest: existing?.price_per_extra_guest || 0,
+                          });
+                        }}
+                        placeholder="0"
+                        className="w-20 px-2 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                      />
+                      <span className="text-sm text-[#5a4f45]">pessoas, + R$</span>
+                      <input
+                        type="number"
+                        value={pricingRules.find(r => r.rule_type === 'guest_surcharge')?.price_per_extra_guest || ''}
+                        onChange={e => {
+                          const val = parseInt(e.target.value) || 0;
+                          const existing = pricingRules.find(r => r.rule_type === 'guest_surcharge');
+                          savePricingRule({
+                            id: existing?.id, rule_type: 'guest_surcharge',
+                            min_guests: existing?.min_guests || 0,
+                            price_per_extra_guest: val,
+                          });
+                        }}
+                        placeholder="0"
+                        className="w-20 px-2 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                      />
+                      <span className="text-sm text-[#5a4f45]">/ pessoa / noite</span>
+                    </div>
+                  </div>
+
+                  {/* Seasonal rules */}
+                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-serif text-base font-bold text-[#1a1410]">Temporadas</h3>
+                      <button
+                        onClick={() => savePricingRule({ rule_type: 'seasonal', price_per_night: 0, season_start_month: 12, season_start_day: 15, season_end_month: 1, season_end_day: 31, label: 'Nova temporada' })}
+                        className="text-xs px-3 py-1.5 bg-[#AC4747] text-white rounded-lg hover:bg-[#8a3636] transition-colors"
+                      >
+                        + Adicionar
+                      </button>
+                    </div>
+                    {pricingRules.filter(r => r.rule_type === 'seasonal').map(rule => (
+                      <div key={rule.id} className="border border-[#d4c9b8]/50 rounded-lg p-3 mb-2 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={rule.label || ''}
+                            onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', label: e.target.value })}
+                            placeholder="Nome da temporada"
+                            className="flex-1 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                          />
+                          <button onClick={() => deletePricingRuleHandler(rule.id)} className="text-red-500 text-sm hover:text-red-700">✕</button>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-[#5a4f45]">
+                          <span>De</span>
+                          <select value={rule.season_start_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_start_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm">
+                            {MONTHS_PT.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+                          </select>
+                          <input type="number" min={1} max={31} value={rule.season_start_day || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_start_day: parseInt(e.target.value) })} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          <span>até</span>
+                          <select value={rule.season_end_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_end_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm">
+                            {MONTHS_PT.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+                          </select>
+                          <input type="number" min={1} max={31} value={rule.season_end_day || 31} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_end_day: parseInt(e.target.value) })} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-[#5a4f45]">R$</span>
+                          <input type="number" value={rule.price_per_night || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', price_per_night: parseInt(e.target.value) || 0 })} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
+                          <span className="text-sm text-[#5a4f45]">/ noite</span>
+                        </div>
+                      </div>
+                    ))}
+                    {pricingRules.filter(r => r.rule_type === 'seasonal').length === 0 && (
+                      <p className="text-sm text-[#d4c9b8]">Nenhuma temporada configurada</p>
+                    )}
+                  </div>
+
+                  {/* Custom date overrides */}
+                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-serif text-base font-bold text-[#1a1410]">Datas customizadas</h3>
+                      <button
+                        onClick={() => savePricingRule({ rule_type: 'custom', price_per_night: 0, date_start: toISODate(pricingYear, pricingMonth, 1), date_end: toISODate(pricingYear, pricingMonth, 7), label: 'Evento especial', priority: 10 })}
+                        className="text-xs px-3 py-1.5 bg-[#AC4747] text-white rounded-lg hover:bg-[#8a3636] transition-colors"
+                      >
+                        + Adicionar
+                      </button>
+                    </div>
+                    {pricingRules.filter(r => r.rule_type === 'custom').map(rule => (
+                      <div key={rule.id} className="border border-[#d4c9b8]/50 rounded-lg p-3 mb-2 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={rule.label || ''}
+                            onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', label: e.target.value })}
+                            placeholder="Nome (ex: Réveillon)"
+                            className="flex-1 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                          />
+                          <button onClick={() => deletePricingRuleHandler(rule.id)} className="text-red-500 text-sm hover:text-red-700">✕</button>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-[#5a4f45]">
+                          <span>De</span>
+                          <input type="date" value={rule.date_start || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', date_start: e.target.value })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          <span>até</span>
+                          <input type="date" value={rule.date_end || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', date_end: e.target.value })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-[#5a4f45]">R$</span>
+                          <input type="number" value={rule.price_per_night || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', price_per_night: parseInt(e.target.value) || 0 })} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
+                          <span className="text-sm text-[#5a4f45]">/ noite</span>
+                        </div>
+                      </div>
+                    ))}
+                    {pricingRules.filter(r => r.rule_type === 'custom').length === 0 && (
+                      <p className="text-sm text-[#d4c9b8]">Nenhuma data customizada</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right column: Pricing calendar preview */}
+                <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                  <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Calendário de preços</h3>
+
+                  {/* Month navigation */}
+                  <div className="flex items-center justify-between mb-3">
+                    <button
+                      onClick={() => { if (pricingMonth === 0) { setPricingMonth(11); setPricingYear(y => y - 1); } else setPricingMonth(m => m - 1); }}
+                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F7F2EB] text-[#5a4f45]"
+                    >←</button>
+                    <span className="font-serif text-base text-[#1a1410]">{MONTHS_PT[pricingMonth]} {pricingYear}</span>
+                    <button
+                      onClick={() => { if (pricingMonth === 11) { setPricingMonth(0); setPricingYear(y => y + 1); } else setPricingMonth(m => m + 1); }}
+                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F7F2EB] text-[#5a4f45]"
+                    >→</button>
+                  </div>
+
+                  {/* Day labels */}
+                  <div className="grid grid-cols-7 gap-0.5 mb-1">
+                    {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
+                      <div key={i} className="text-center text-xs font-semibold text-[#5a4f45] py-1">{d}</div>
+                    ))}
+                  </div>
+
+                  {/* Calendar grid */}
+                  <div className="grid grid-cols-7 gap-0.5">
+                    {(() => {
+                      const firstDay = new Date(pricingYear, pricingMonth, 1).getDay();
+                      const daysInMonth = new Date(pricingYear, pricingMonth + 1, 0).getDate();
+                      const cells: (number | null)[] = [];
+                      for (let i = 0; i < firstDay; i++) cells.push(null);
+                      for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+                      return cells.map((day, i) => {
+                        if (day === null) return <div key={`e-${i}`} />;
+                        const dateStr = toISODate(pricingYear, pricingMonth, day);
+                        const priceInfo = getPriceForDateLocal(dateStr);
+                        const bgColor = !priceInfo ? 'bg-gray-50' :
+                          priceInfo.type === 'custom' ? 'bg-purple-50 border-purple-200' :
+                          priceInfo.type === 'seasonal' ? 'bg-green-50 border-green-200' :
+                          priceInfo.type === 'weekend' ? 'bg-blue-50 border-blue-200' :
+                          'bg-white';
+                        return (
+                          <div
+                            key={day}
+                            className={`aspect-square flex flex-col items-center justify-center rounded-lg border text-xs ${bgColor} transition-colors`}
+                            title={priceInfo ? `${priceInfo.label}: R$${priceInfo.price}` : 'Sem preço configurado'}
+                          >
+                            <span className="font-medium text-[#1a1410]">{day}</span>
+                            {priceInfo && (
+                              <span className="text-[10px] text-[#5a4f45] leading-none mt-0.5">
+                                {priceInfo.price}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex flex-wrap gap-3 mt-4 text-xs text-[#5a4f45]">
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-white border border-[#d4c9b8]" /> Base</div>
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-50 border border-blue-200" /> Fim de semana</div>
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-50 border border-green-200" /> Temporada</div>
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-purple-50 border border-purple-200" /> Customizado</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!pricingProperty && (
+              <div className="text-center py-16 text-[#d4c9b8]">
+                <p className="font-serif text-lg">Selecione um imóvel para gerenciar preços</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ─── TAB: IMOVEIS ─── */}
         {!loading && activeTab === 'imoveis' && (
           <div className="space-y-6">
@@ -1348,17 +1756,94 @@ export default function AdminPage() {
                       />
                     </div>
 
-                    {/* Images */}
+                    {/* Images — Upload + URLs */}
                     <div className="sm:col-span-2">
                       <label className="block text-sm font-medium text-[#5a4f45] mb-1">
-                        Imagens <span className="text-[#d4c9b8] font-normal">(uma URL por linha)</span>
+                        Imagens
                       </label>
+
+                      {/* Upload button */}
+                      <div className="mb-3">
+                        <input
+                          type="file"
+                          id="image-upload"
+                          accept="image/jpeg,image/png,image/webp"
+                          multiple
+                          className="hidden"
+                          onChange={async (e) => {
+                            const files = e.target.files;
+                            if (!files?.length) return;
+                            setUploadingImages(true);
+                            try {
+                              const fd = new FormData();
+                              for (const f of Array.from(files)) fd.append('files', f);
+                              fd.append('propertyId', propertyForm.id || 'novo');
+                              const res = await fetchApi('/api/upload', { method: 'POST', body: fd, raw: true });
+                              const data = await res.json();
+                              if (data.urls) {
+                                const current = propertyForm.images.trim();
+                                const newUrls = data.urls.join('\n');
+                                setPropertyForm(f => ({
+                                  ...f,
+                                  images: current ? current + '\n' + newUrls : newUrls,
+                                }));
+                              }
+                            } catch (err) { console.error('Upload error:', err); }
+                            finally {
+                              setUploadingImages(false);
+                              e.target.value = '';
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById('image-upload')?.click()}
+                          disabled={uploadingImages}
+                          className="px-4 py-2 bg-[#AC4747] text-white rounded-lg text-sm font-medium hover:bg-[#8a3636] transition-colors disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {uploadingImages ? (
+                            <>
+                              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                              Enviando...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                              Enviar fotos
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Preview grid */}
+                      {propertyForm.images.trim() && (
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-3">
+                          {propertyForm.images.split('\n').map(u => u.trim()).filter(Boolean).map((url, i) => (
+                            <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-[#d4c9b8]">
+                              <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const imgs = propertyForm.images.split('\n').map(u => u.trim()).filter(Boolean);
+                                  imgs.splice(i, 1);
+                                  setPropertyForm(f => ({ ...f, images: imgs.join('\n') }));
+                                }}
+                                className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* URL textarea */}
                       <textarea
                         value={propertyForm.images}
                         onChange={e => setPropertyForm(f => ({ ...f, images: e.target.value }))}
-                        rows={4}
-                        placeholder="https://exemplo.com/foto1.jpg"
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 resize-none font-mono"
+                        rows={3}
+                        placeholder="Ou cole URLs de imagens (uma por linha)"
+                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 resize-none font-mono text-[#5a4f45]"
                       />
                     </div>
 

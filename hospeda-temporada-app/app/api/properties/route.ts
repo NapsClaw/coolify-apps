@@ -7,12 +7,28 @@ import {
   updateProperty,
   deleteProperty,
 } from '@/lib/queries';
+import { getDb } from '@/lib/db';
 
 export async function GET() {
   try {
     await ensureDb();
     const properties = await getAllProperties();
-    return NextResponse.json(properties);
+
+    // Fetch base prices for all properties
+    const sql = getDb();
+    const basePrices = await sql`
+      SELECT property_id, price_per_night
+      FROM pricing_rules
+      WHERE rule_type = 'base' AND active = true
+    `;
+    const priceMap = new Map(basePrices.map((r: Record<string, unknown>) => [r.property_id, r.price_per_night]));
+
+    const result = properties.map((p: Record<string, unknown>) => ({
+      ...p,
+      base_price: priceMap.get(p.id as string) ?? null,
+    }));
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('GET /api/properties error:', error);
     return NextResponse.json({ error: 'Failed to fetch properties' }, { status: 500 });

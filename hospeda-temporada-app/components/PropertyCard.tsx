@@ -83,13 +83,25 @@ export default function PropertyCard({ property, onOpen }: PropertyCardProps) {
 
         {/* Price */}
         <div className="mt-auto pt-3 border-t border-[#d4c9b8]/40">
-          <span className="font-serif text-xl text-[#AC4747] font-bold">
-            {property.price}
-          </span>
-          {property.price_unit && (
-            <span className="text-[#5a4f45] font-sans text-sm ml-1">
-              {property.price_unit}
-            </span>
+          {property.base_price ? (
+            <>
+              <span className="text-[#5a4f45] font-sans text-xs">a partir de </span>
+              <span className="font-serif text-xl text-[#AC4747] font-bold">
+                R$ {property.base_price.toLocaleString('pt-BR')}
+              </span>
+              <span className="text-[#5a4f45] font-sans text-sm ml-1">/noite</span>
+            </>
+          ) : (
+            <>
+              <span className="font-serif text-xl text-[#AC4747] font-bold">
+                {property.price}
+              </span>
+              {property.price_unit && (
+                <span className="text-[#5a4f45] font-sans text-sm ml-1">
+                  {property.price_unit}
+                </span>
+              )}
+            </>
           )}
         </div>
 
