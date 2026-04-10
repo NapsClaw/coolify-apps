@@ -9,10 +9,12 @@ interface PropertyModalProps {
   onClose: () => void;
 }
 
-function eachDayInRange(start: string, end: string): string[] {
+function eachDayInRange(start: string | null, end: string | null): string[] {
+  if (!start || !end) return [];
   const days: string[] = [];
   const current = new Date(start + "T00:00:00");
   const last = new Date(end + "T00:00:00");
+  if (isNaN(current.getTime()) || isNaN(last.getTime())) return [];
   while (current <= last) {
     days.push(current.toISOString().split("T")[0]);
     current.setDate(current.getDate() + 1);
