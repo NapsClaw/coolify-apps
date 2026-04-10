@@ -9,11 +9,17 @@ interface PropertyModalProps {
   onClose: () => void;
 }
 
+function toDateOnly(d: string): string {
+  return d.slice(0, 10);
+}
+
 function eachDayInRange(start: string | null, end: string | null): string[] {
   if (!start || !end) return [];
+  const s = toDateOnly(start);
+  const e = toDateOnly(end);
   const days: string[] = [];
-  const current = new Date(start + "T00:00:00");
-  const last = new Date(end + "T00:00:00");
+  const current = new Date(s + "T00:00:00");
+  const last = new Date(e + "T00:00:00");
   if (isNaN(current.getTime()) || isNaN(last.getTime())) return [];
   while (current <= last) {
     days.push(current.toISOString().split("T")[0]);
