@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       occasion: data.occasion,
     });
 
-    return NextResponse.json(result[0] || { success: true }, { status: 201 });
+    return NextResponse.json(result || { success: true }, { status: 201 });
   } catch (error) {
     console.error('POST /api/reservations error:', error);
     return NextResponse.json({ error: 'Failed to create reservation' }, { status: 500 });

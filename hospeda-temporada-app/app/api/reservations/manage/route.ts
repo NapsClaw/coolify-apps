@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       admin_notes: data.admin_notes,
     });
 
-    return NextResponse.json(result[0] || { success: true }, { status: 201 });
+    return NextResponse.json(result || { success: true }, { status: 201 });
   } catch (error) {
     console.error('POST /api/reservations/manage error:', error);
     return NextResponse.json({ error: 'Failed to create manual block' }, { status: 500 });
@@ -63,7 +63,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const result = await updateReservationStatus(id, status);
-    return NextResponse.json(result[0] || { success: true });
+    return NextResponse.json(result || { success: true });
   } catch (error) {
     console.error('PUT /api/reservations/manage error:', error);
     return NextResponse.json({ error: 'Failed to update reservation status' }, { status: 500 });

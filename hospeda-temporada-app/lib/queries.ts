@@ -7,12 +7,16 @@ function toDateStr(d: string | Date): string {
   return (d as Date).toISOString().slice(0, 10);
 }
 
-function normalizeReservationDates<T extends { date_start?: string | Date; date_end?: string | Date }>(rows: T[]): T[] {
-  return rows.map(r => ({
-    ...r,
-    date_start: r.date_start ? toDateStr(r.date_start) : r.date_start,
-    date_end: r.date_end ? toDateStr(r.date_end) : r.date_end,
-  }));
+function normalizeReservationDates<T extends Record<string, unknown>>(rows: T[]): T[] {
+  return rows.map(r => {
+    const plain: Record<string, unknown> = {};
+    for (const key of Object.keys(r)) {
+      plain[key] = r[key];
+    }
+    if (plain.date_start) plain.date_start = toDateStr(plain.date_start as string | Date);
+    if (plain.date_end) plain.date_end = toDateStr(plain.date_end as string | Date);
+    return plain as T;
+  });
 }
 
 // ─── Properties ───
