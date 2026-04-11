@@ -3,7 +3,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
+const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       const buffer = Buffer.from(await file.arrayBuffer());
       await writeFile(filepath, buffer);
 
-      urls.push(`/uploads/${filename}`);
+      urls.push(`/api/uploads?file=${filename}`);
     }
 
     return NextResponse.json({ urls }, { status: 201 });
