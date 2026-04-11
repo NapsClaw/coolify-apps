@@ -297,16 +297,31 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
               </span>
             )}
           </div>
+        </div>
+
+        {/* Calendar section */}
+        <div className="px-5 py-4 border-b border-[#d4c9b8]/30">
+          <h3 className="font-serif text-lg text-[#1a1410] mb-3">
+            Calendário de disponibilidade
+          </h3>
+          <Calendar
+            blockedDates={blockedDates}
+            pendingDates={pendingDates}
+            selectedStart={selectedStart}
+            selectedEnd={selectedEnd}
+            onSelectDay={handleSelectDay}
+            mode="select"
+          />
 
           {/* Dynamic price breakdown */}
           {priceLoading && (
-            <div className="bg-[#F7F2EB] rounded-xl p-4 animate-pulse">
+            <div className="bg-[#F7F2EB] rounded-xl p-4 mt-4 animate-pulse">
               <div className="h-4 bg-[#d4c9b8]/40 rounded w-1/2 mb-2" />
               <div className="h-6 bg-[#d4c9b8]/40 rounded w-1/3" />
             </div>
           )}
           {!priceLoading && priceBreakdown?.has_dynamic_pricing && priceBreakdown.total != null && (
-            <div className="bg-[#F7F2EB] rounded-xl p-4 space-y-2">
+            <div className="bg-[#F7F2EB] rounded-xl p-4 mt-4 space-y-2">
               <div className="flex justify-between items-center">
                 <span className="font-sans text-sm text-[#5a4f45]">
                   {priceBreakdown.nights} {priceBreakdown.nights === 1 ? 'noite' : 'noites'}
@@ -333,21 +348,6 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
               </div>
             </div>
           )}
-        </div>
-
-        {/* Calendar section */}
-        <div className="px-5 py-4 border-b border-[#d4c9b8]/30">
-          <h3 className="font-serif text-lg text-[#1a1410] mb-3">
-            Calendário de disponibilidade
-          </h3>
-          <Calendar
-            blockedDates={blockedDates}
-            pendingDates={pendingDates}
-            selectedStart={selectedStart}
-            selectedEnd={selectedEnd}
-            onSelectDay={handleSelectDay}
-            mode="select"
-          />
         </div>
 
         {/* Reservation form */}
