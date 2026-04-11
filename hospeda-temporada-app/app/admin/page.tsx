@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // ─── Types ───
 
@@ -189,6 +189,8 @@ export default function AdminPage() {
   const [pricingLoading, setPricingLoading] = useState(false);
   const [pricingMonth, setPricingMonth] = useState(new Date().getMonth());
   const [pricingYear, setPricingYear] = useState(new Date().getFullYear());
+  const [localPrices, setLocalPrices] = useState<Record<string, string>>({});
+  const priceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   // ─── Auth ───
 
@@ -340,7 +342,7 @@ export default function AdminPage() {
     }
   }, [authenticated, activeTab, pricingProperty, loadPricingRules]);
 
-  const savePricingRule = async (data: Record<string, unknown>) => {
+  const savePricingRule = useCallback(async (data: Record<string, unknown>) => {
     setActionLoading('pricing');
     try {
       if (data.id) {
@@ -351,7 +353,37 @@ export default function AdminPage() {
       await loadPricingRules(pricingProperty);
     } catch (err) { console.error(err); }
     finally { setActionLoading(null); }
-  };
+  }, [fetchApi, pricingProperty, loadPricingRules]);
+
+  // Sync local prices when rules load from API
+  useEffect(() => {
+    const prices: Record<string, string> = {};
+    const base = pricingRules.find(r => r.rule_type === 'base');
+    if (base?.price_per_night) prices['base'] = String(base.price_per_night);
+    const weekend = pricingRules.find(r => r.rule_type === 'weekend');
+    if (weekend?.price_per_night) prices['weekend'] = String(weekend.price_per_night);
+    const surcharge = pricingRules.find(r => r.rule_type === 'guest_surcharge');
+    if (surcharge?.min_guests) prices['min_guests'] = String(surcharge.min_guests);
+    if (surcharge?.price_per_extra_guest) prices['price_extra'] = String(surcharge.price_per_extra_guest);
+    pricingRules.filter(r => r.rule_type === 'seasonal').forEach(r => {
+      if (r.price_per_night) prices[`seasonal_${r.id}`] = String(r.price_per_night);
+      if (r.label) prices[`seasonal_label_${r.id}`] = r.label;
+      if (r.season_start_day) prices[`seasonal_start_day_${r.id}`] = String(r.season_start_day);
+      if (r.season_end_day) prices[`seasonal_end_day_${r.id}`] = String(r.season_end_day);
+    });
+    pricingRules.filter(r => r.rule_type === 'custom').forEach(r => {
+      if (r.price_per_night) prices[`custom_${r.id}`] = String(r.price_per_night);
+      if (r.label) prices[`custom_label_${r.id}`] = r.label;
+    });
+    setLocalPrices(prices);
+  }, [pricingRules]);
+
+  const debouncedSavePricingRule = useCallback((key: string, data: Record<string, unknown>) => {
+    if (priceTimers.current[key]) clearTimeout(priceTimers.current[key]);
+    priceTimers.current[key] = setTimeout(() => {
+      savePricingRule(data);
+    }, 800);
+  }, [savePricingRule]);
 
   const deletePricingRuleHandler = async (id: number) => {
     setActionLoading('pricing');
@@ -1277,11 +1309,12 @@ export default function AdminPage() {
                       <span className="text-sm text-[#5a4f45]">R$</span>
                       <input
                         type="number"
-                        value={pricingRules.find(r => r.rule_type === 'base')?.price_per_night || ''}
+                        value={localPrices['base'] ?? ''}
                         onChange={e => {
+                          setLocalPrices(prev => ({ ...prev, base: e.target.value }));
                           const val = parseInt(e.target.value) || 0;
                           const existing = pricingRules.find(r => r.rule_type === 'base');
-                          savePricingRule({ id: existing?.id, rule_type: 'base', price_per_night: val });
+                          debouncedSavePricingRule('base', { id: existing?.id, rule_type: 'base', price_per_night: val });
                         }}
                         placeholder="0"
                         className="w-32 px-3 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
@@ -1297,11 +1330,12 @@ export default function AdminPage() {
                       <span className="text-sm text-[#5a4f45]">R$</span>
                       <input
                         type="number"
-                        value={pricingRules.find(r => r.rule_type === 'weekend')?.price_per_night || ''}
+                        value={localPrices['weekend'] ?? ''}
                         onChange={e => {
+                          setLocalPrices(prev => ({ ...prev, weekend: e.target.value }));
                           const val = parseInt(e.target.value) || 0;
                           const existing = pricingRules.find(r => r.rule_type === 'weekend');
-                          savePricingRule({ id: existing?.id, rule_type: 'weekend', price_per_night: val, weekend_days: existing?.weekend_days || [5, 6] });
+                          debouncedSavePricingRule('weekend', { id: existing?.id, rule_type: 'weekend', price_per_night: val, weekend_days: existing?.weekend_days || [5, 6] });
                         }}
                         placeholder="0"
                         className="w-32 px-3 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
@@ -1340,11 +1374,12 @@ export default function AdminPage() {
                       <span className="text-sm text-[#5a4f45]">A partir de</span>
                       <input
                         type="number"
-                        value={pricingRules.find(r => r.rule_type === 'guest_surcharge')?.min_guests || ''}
+                        value={localPrices['min_guests'] ?? ''}
                         onChange={e => {
+                          setLocalPrices(prev => ({ ...prev, min_guests: e.target.value }));
                           const val = parseInt(e.target.value) || 0;
                           const existing = pricingRules.find(r => r.rule_type === 'guest_surcharge');
-                          savePricingRule({
+                          debouncedSavePricingRule('min_guests', {
                             id: existing?.id, rule_type: 'guest_surcharge',
                             min_guests: val,
                             price_per_extra_guest: existing?.price_per_extra_guest || 0,
@@ -1356,11 +1391,12 @@ export default function AdminPage() {
                       <span className="text-sm text-[#5a4f45]">pessoas, + R$</span>
                       <input
                         type="number"
-                        value={pricingRules.find(r => r.rule_type === 'guest_surcharge')?.price_per_extra_guest || ''}
+                        value={localPrices['price_extra'] ?? ''}
                         onChange={e => {
+                          setLocalPrices(prev => ({ ...prev, price_extra: e.target.value }));
                           const val = parseInt(e.target.value) || 0;
                           const existing = pricingRules.find(r => r.rule_type === 'guest_surcharge');
-                          savePricingRule({
+                          debouncedSavePricingRule('price_extra', {
                             id: existing?.id, rule_type: 'guest_surcharge',
                             min_guests: existing?.min_guests || 0,
                             price_per_extra_guest: val,
@@ -1389,8 +1425,11 @@ export default function AdminPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
-                            value={rule.label || ''}
-                            onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', label: e.target.value })}
+                            value={localPrices[`seasonal_label_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`seasonal_label_${rule.id}`]: e.target.value }));
+                              debouncedSavePricingRule(`seasonal_label_${rule.id}`, { id: rule.id, rule_type: 'seasonal', label: e.target.value });
+                            }}
                             placeholder="Nome da temporada"
                             className="flex-1 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
                           />
@@ -1401,16 +1440,25 @@ export default function AdminPage() {
                           <select value={rule.season_start_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_start_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm">
                             {MONTHS_PT.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                           </select>
-                          <input type="number" min={1} max={31} value={rule.season_start_day || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_start_day: parseInt(e.target.value) })} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          <input type="number" min={1} max={31} value={localPrices[`seasonal_start_day_${rule.id}`] ?? rule.season_start_day ?? 1} onChange={e => {
+                            setLocalPrices(prev => ({ ...prev, [`seasonal_start_day_${rule.id}`]: e.target.value }));
+                            debouncedSavePricingRule(`seasonal_start_day_${rule.id}`, { id: rule.id, rule_type: 'seasonal', season_start_day: parseInt(e.target.value) });
+                          }} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
                           <span>até</span>
                           <select value={rule.season_end_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_end_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm">
                             {MONTHS_PT.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                           </select>
-                          <input type="number" min={1} max={31} value={rule.season_end_day || 31} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_end_day: parseInt(e.target.value) })} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          <input type="number" min={1} max={31} value={localPrices[`seasonal_end_day_${rule.id}`] ?? rule.season_end_day ?? 31} onChange={e => {
+                            setLocalPrices(prev => ({ ...prev, [`seasonal_end_day_${rule.id}`]: e.target.value }));
+                            debouncedSavePricingRule(`seasonal_end_day_${rule.id}`, { id: rule.id, rule_type: 'seasonal', season_end_day: parseInt(e.target.value) });
+                          }} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-[#5a4f45]">R$</span>
-                          <input type="number" value={rule.price_per_night || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', price_per_night: parseInt(e.target.value) || 0 })} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
+                          <input type="number" value={localPrices[`seasonal_${rule.id}`] ?? ''} onChange={e => {
+                            setLocalPrices(prev => ({ ...prev, [`seasonal_${rule.id}`]: e.target.value }));
+                            debouncedSavePricingRule(`seasonal_${rule.id}`, { id: rule.id, rule_type: 'seasonal', price_per_night: parseInt(e.target.value) || 0 });
+                          }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
                           <span className="text-sm text-[#5a4f45]">/ noite</span>
                         </div>
                       </div>
@@ -1436,8 +1484,11 @@ export default function AdminPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
-                            value={rule.label || ''}
-                            onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', label: e.target.value })}
+                            value={localPrices[`custom_label_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`custom_label_${rule.id}`]: e.target.value }));
+                              debouncedSavePricingRule(`custom_label_${rule.id}`, { id: rule.id, rule_type: 'custom', label: e.target.value });
+                            }}
                             placeholder="Nome (ex: Réveillon)"
                             className="flex-1 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
                           />
@@ -1451,7 +1502,10 @@ export default function AdminPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-[#5a4f45]">R$</span>
-                          <input type="number" value={rule.price_per_night || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', price_per_night: parseInt(e.target.value) || 0 })} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
+                          <input type="number" value={localPrices[`custom_${rule.id}`] ?? ''} onChange={e => {
+                            setLocalPrices(prev => ({ ...prev, [`custom_${rule.id}`]: e.target.value }));
+                            debouncedSavePricingRule(`custom_${rule.id}`, { id: rule.id, rule_type: 'custom', price_per_night: parseInt(e.target.value) || 0 });
+                          }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
                           <span className="text-sm text-[#5a4f45]">/ noite</span>
                         </div>
                       </div>
