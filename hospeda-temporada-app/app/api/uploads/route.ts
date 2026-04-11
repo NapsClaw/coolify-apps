@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
+const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 
 const MIME_TYPES: Record<string, string> = {
   jpg: 'image/jpeg',
