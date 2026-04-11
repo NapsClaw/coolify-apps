@@ -313,6 +313,24 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
             mode="select"
           />
 
+          {/* Guest selector — above pricing so user sees price update */}
+          <div className="mt-4">
+            <select
+              value={formData.pessoas}
+              onChange={(e) =>
+                setFormData({ ...formData, pessoas: e.target.value })
+              }
+              className="w-full border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747]"
+            >
+              <option value="">Nº de pessoas</option>
+              <option value="1-5">1-5</option>
+              <option value="6-10">6-10</option>
+              <option value="11-20">11-20</option>
+              <option value="21-30">21-30</option>
+              <option value="30+">30+</option>
+            </select>
+          </div>
+
           {/* Dynamic price breakdown */}
           {priceLoading && (
             <div className="bg-[#F7F2EB] rounded-xl p-4 mt-4 animate-pulse">
@@ -395,23 +413,6 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
             }
             className="border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] text-sm placeholder:text-[#5a4f45]/50 focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747]"
           />
-
-          {/* Guests */}
-          <select
-            required
-            value={formData.pessoas}
-            onChange={(e) =>
-              setFormData({ ...formData, pessoas: e.target.value })
-            }
-            className="border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747]"
-          >
-            <option value="">Nº de pessoas</option>
-            <option value="1-5">1-5</option>
-            <option value="6-10">6-10</option>
-            <option value="11-20">11-20</option>
-            <option value="21-30">21-30</option>
-            <option value="30+">30+</option>
-          </select>
 
           {/* Occasion */}
           <select
