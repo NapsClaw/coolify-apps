@@ -103,13 +103,17 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
     [selectedStart, selectedEnd]
   );
 
-  // Fetch price when dates + guests are selected
+  // Fetch price only when dates + exact guest count are selected
   useEffect(() => {
-    if (!property || !selectedStart || !selectedEnd) {
+    if (!property || !selectedStart || !selectedEnd || !formData.pessoas) {
       setPriceBreakdown(null);
       return;
     }
-    const guestCount = formData.pessoas ? parseInt(formData.pessoas, 10) : 1;
+    const guestCount = parseInt(formData.pessoas, 10);
+    if (!Number.isFinite(guestCount) || guestCount < 1) {
+      setPriceBreakdown(null);
+      return;
+    }
 
     const timer = setTimeout(async () => {
       setPriceLoading(true);
