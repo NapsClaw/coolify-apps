@@ -660,22 +660,22 @@ export default function AdminPage() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#F7F2EB] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
           <div className="text-center mb-8">
-            <h1 className="font-serif text-3xl font-bold text-[#AC4747] mb-1">
+            <h1 className="font-serif text-3xl font-bold text-[#2563EB] mb-1">
               HospedaTemporada
             </h1>
-            <p className="text-[#5a4f45] text-sm">Painel Administrativo</p>
+            <p className="text-[#4B5563] text-sm">Painel Administrativo</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#5a4f45] mb-1">Senha</label>
+              <label className="block text-sm font-medium text-[#4B5563] mb-1">Senha</label>
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-[#d4c9b8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 focus:border-[#AC4747] bg-[#F7F2EB]/50"
+                className="w-full px-4 py-3 border border-[#BFDBFE] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] bg-[#F8FAFC]/50"
                 placeholder="Digite a senha do admin"
                 autoFocus
               />
@@ -686,7 +686,7 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loginLoading || !password}
-              className="w-full py-3 bg-[#AC4747] text-white rounded-lg font-semibold hover:bg-[#8a3636] transition-colors disabled:opacity-50"
+              className="w-full py-3 bg-[#2563EB] text-white rounded-lg font-semibold hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
             >
               {loginLoading ? 'Verificando...' : 'Entrar'}
             </button>
@@ -710,7 +710,7 @@ export default function AdminPage() {
     // Day headers
     for (const d of DAYS_PT) {
       cells.push(
-        <div key={`h-${d}`} className="text-center text-xs font-semibold text-[#5a4f45] py-1">
+        <div key={`h-${d}`} className="text-center text-xs font-semibold text-[#4B5563] py-1">
           {d}
         </div>
       );
@@ -739,7 +739,7 @@ export default function AdminPage() {
       const isInSelection = blockStart && blockEnd && dateStr >= blockStart && dateStr <= blockEnd;
 
       let bgClass = 'bg-white hover:bg-emerald-50 cursor-pointer';
-      let textClass = 'text-[#1a1410]';
+      let textClass = 'text-[#111827]';
 
       if (isPast) {
         bgClass = 'bg-gray-100 cursor-default';
@@ -751,11 +751,11 @@ export default function AdminPage() {
         bgClass = 'bg-amber-100 hover:bg-amber-200 cursor-pointer border-amber-300';
         textClass = 'text-amber-800';
       } else if (isSelected) {
-        bgClass = 'bg-[#AC4747] cursor-pointer';
+        bgClass = 'bg-[#2563EB] cursor-pointer';
         textClass = 'text-white';
       } else if (isInSelection) {
-        bgClass = 'bg-[#AC4747]/20 cursor-pointer';
-        textClass = 'text-[#AC4747]';
+        bgClass = 'bg-[#2563EB]/20 cursor-pointer';
+        textClass = 'text-[#2563EB]';
       }
 
       cells.push(
@@ -764,7 +764,7 @@ export default function AdminPage() {
           onClick={() => !isPast && handleCalendarDayClick(dateStr)}
           disabled={isPast}
           aria-label={dateStr}
-          className={`relative aspect-square flex items-center justify-center rounded-lg text-sm font-medium border transition-colors ${bgClass} ${textClass} ${isToday ? 'ring-2 ring-[#AC4747]' : ''} ${isPast ? 'opacity-40 cursor-not-allowed' : ''}`}
+          className={`relative aspect-square flex items-center justify-center rounded-lg text-sm font-medium border transition-colors ${bgClass} ${textClass} ${isToday ? 'ring-2 ring-[#2563EB]' : ''} ${isPast ? 'opacity-40 cursor-not-allowed' : ''}`}
         >
           {day}
           {isPending && (
@@ -779,7 +779,7 @@ export default function AdminPage() {
 
     return (
       <div>
-        <h3 className="text-center font-serif font-semibold text-lg text-[#1a1410] mb-3">
+        <h3 className="text-center font-serif font-semibold text-lg text-[#111827] mb-3">
           {MONTHS_PT[month]} {year}
         </h3>
         <div className="grid grid-cols-7 gap-1">
@@ -792,15 +792,15 @@ export default function AdminPage() {
   // ─── ADMIN PANEL ───
 
   return (
-    <div className="min-h-screen bg-[#F7F2EB]">
+    <div className="min-h-screen bg-[#F8FAFC]">
       {/* Header */}
-      <header className="bg-white border-b border-[#d4c9b8] sticky top-0 z-40">
+      <header className="bg-white border-b border-[#BFDBFE] sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#AC4747]">
+            <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#2563EB]">
               HospedaTemporada
             </h1>
-            <span className="hidden sm:inline text-xs bg-[#AC4747]/10 text-[#AC4747] px-2 py-0.5 rounded-full font-medium">
+            <span className="hidden sm:inline text-xs bg-[#2563EB]/10 text-[#2563EB] px-2 py-0.5 rounded-full font-medium">
               Admin
             </span>
           </div>
@@ -809,7 +809,7 @@ export default function AdminPage() {
               localStorage.removeItem('admin_password');
               setAuthenticated(false);
             }}
-            className="text-sm text-[#5a4f45] hover:text-[#AC4747] transition-colors"
+            className="text-sm text-[#4B5563] hover:text-[#2563EB] transition-colors"
           >
             Sair
           </button>
@@ -829,8 +829,8 @@ export default function AdminPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.key
-                    ? 'border-[#AC4747] text-[#AC4747]'
-                    : 'border-transparent text-[#5a4f45] hover:text-[#1a1410]'
+                    ? 'border-[#2563EB] text-[#2563EB]'
+                    : 'border-transparent text-[#4B5563] hover:text-[#111827]'
                 }`}
               >
                 <span className="mr-1.5">{tab.icon}</span>
@@ -849,7 +849,7 @@ export default function AdminPage() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         {loading && (
           <div className="flex justify-center py-12">
-            <div className="animate-spin w-8 h-8 border-4 border-[#AC4747] border-t-transparent rounded-full" />
+            <div className="animate-spin w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full" />
           </div>
         )}
 
@@ -859,7 +859,7 @@ export default function AdminPage() {
             {/* Pending Section */}
             <section className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-5">
               <div className="flex items-center gap-3 mb-4">
-                <h2 className="font-serif text-xl font-bold text-[#1a1410]">
+                <h2 className="font-serif text-xl font-bold text-[#111827]">
                   Solicitações pendentes
                 </h2>
                 <span className="bg-amber-500 text-white text-sm font-bold px-2.5 py-0.5 rounded-full">
@@ -868,7 +868,7 @@ export default function AdminPage() {
               </div>
 
               {pendingReservations.length === 0 ? (
-                <p className="text-[#5a4f45] text-sm py-4 text-center">
+                <p className="text-[#4B5563] text-sm py-4 text-center">
                   Nenhuma solicitação pendente
                 </p>
               ) : (
@@ -877,10 +877,10 @@ export default function AdminPage() {
                     <div key={r.id} className="bg-white rounded-xl border border-amber-200 p-4 shadow-sm">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <p className="font-semibold text-[#1a1410] text-sm">
+                          <p className="font-semibold text-[#111827] text-sm">
                             {getPropertyName(r.property_id)}
                           </p>
-                          <p className="text-xs text-[#5a4f45]">{relativeTime(r.created_at)}</p>
+                          <p className="text-xs text-[#4B5563]">{relativeTime(r.created_at)}</p>
                         </div>
                         <span className="bg-amber-100 text-amber-700 text-xs font-medium px-2 py-0.5 rounded-full">
                           Pendente
@@ -888,27 +888,27 @@ export default function AdminPage() {
                       </div>
                       <div className="space-y-1.5 text-sm mb-4">
                         {r.guest_name && (
-                          <p className="text-[#1a1410]">
-                            <span className="text-[#5a4f45]">Hóspede:</span> {r.guest_name}
+                          <p className="text-[#111827]">
+                            <span className="text-[#4B5563]">Hóspede:</span> {r.guest_name}
                           </p>
                         )}
                         {r.guest_phone && (
-                          <p className="text-[#1a1410]">
-                            <span className="text-[#5a4f45]">Telefone:</span> {r.guest_phone}
+                          <p className="text-[#111827]">
+                            <span className="text-[#4B5563]">Telefone:</span> {r.guest_phone}
                           </p>
                         )}
                         {r.occasion && (
-                          <p className="text-[#1a1410]">
-                            <span className="text-[#5a4f45]">Ocasião:</span> {r.occasion}
+                          <p className="text-[#111827]">
+                            <span className="text-[#4B5563]">Ocasião:</span> {r.occasion}
                           </p>
                         )}
                         {r.guest_count && (
-                          <p className="text-[#1a1410]">
-                            <span className="text-[#5a4f45]">Hóspedes:</span> {r.guest_count}
+                          <p className="text-[#111827]">
+                            <span className="text-[#4B5563]">Hóspedes:</span> {r.guest_count}
                           </p>
                         )}
-                        <p className="text-[#1a1410]">
-                          <span className="text-[#5a4f45]">Datas:</span>{' '}
+                        <p className="text-[#111827]">
+                          <span className="text-[#4B5563]">Datas:</span>{' '}
                           {formatDate(r.date_start)} → {formatDate(r.date_end)}
                         </p>
                       </div>
@@ -949,7 +949,7 @@ export default function AdminPage() {
               <select
                 value={filterProperty}
                 onChange={e => setFilterProperty(e.target.value)}
-                className="px-3 py-2 bg-white border border-[#d4c9b8] rounded-lg text-sm text-[#1a1410] focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                className="px-3 py-2 bg-white border border-[#BFDBFE] rounded-lg text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
               >
                 <option value="">Todos os imóveis</option>
                 {properties.map(p => (
@@ -959,7 +959,7 @@ export default function AdminPage() {
               <select
                 value={filterStatus}
                 onChange={e => setFilterStatus(e.target.value)}
-                className="px-3 py-2 bg-white border border-[#d4c9b8] rounded-lg text-sm text-[#1a1410] focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                className="px-3 py-2 bg-white border border-[#BFDBFE] rounded-lg text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
               >
                 <option value="">Todos os status</option>
                 <option value="pending">Pendente</option>
@@ -971,17 +971,17 @@ export default function AdminPage() {
 
             {/* Approved section */}
             <section>
-              <h2 className="font-serif text-xl font-bold text-[#1a1410] mb-4">
+              <h2 className="font-serif text-xl font-bold text-[#111827] mb-4">
                 {filterStatus ? `Reservas — ${filterStatus}` : 'Reservas aprovadas'}
               </h2>
               {(filterStatus ? allFilteredNonPending : approvedReservations).length === 0 ? (
-                <p className="text-[#5a4f45] text-sm py-4 text-center bg-white rounded-xl border border-[#d4c9b8]">
+                <p className="text-[#4B5563] text-sm py-4 text-center bg-white rounded-xl border border-[#BFDBFE]">
                   Nenhuma reserva encontrada
                 </p>
               ) : (
-                <div className="bg-white rounded-xl border border-[#d4c9b8] overflow-hidden">
+                <div className="bg-white rounded-xl border border-[#BFDBFE] overflow-hidden">
                   {/* Desktop table header */}
-                  <div className="hidden md:grid md:grid-cols-[1.5fr_1.5fr_1fr_1fr_0.8fr_1fr] gap-3 px-5 py-3 bg-[#F7F2EB] border-b border-[#d4c9b8] text-xs font-semibold text-[#5a4f45] uppercase tracking-wide">
+                  <div className="hidden md:grid md:grid-cols-[1.5fr_1.5fr_1fr_1fr_0.8fr_1fr] gap-3 px-5 py-3 bg-[#F8FAFC] border-b border-[#BFDBFE] text-xs font-semibold text-[#4B5563] uppercase tracking-wide">
                     <div>Imóvel</div>
                     <div>Hóspede</div>
                     <div>Check-in</div>
@@ -992,26 +992,26 @@ export default function AdminPage() {
                   {(filterStatus ? allFilteredNonPending : approvedReservations).map(r => (
                     <div
                       key={r.id}
-                      className="grid md:grid-cols-[1.5fr_1.5fr_1fr_1fr_0.8fr_1fr] gap-3 px-5 py-4 border-b border-[#d4c9b8]/50 items-center last:border-b-0"
+                      className="grid md:grid-cols-[1.5fr_1.5fr_1fr_1fr_0.8fr_1fr] gap-3 px-5 py-4 border-b border-[#BFDBFE]/50 items-center last:border-b-0"
                     >
                       <div>
-                        <p className="font-medium text-sm text-[#1a1410]">{getPropertyName(r.property_id)}</p>
-                        <p className="text-xs text-[#5a4f45] md:hidden">
+                        <p className="font-medium text-sm text-[#111827]">{getPropertyName(r.property_id)}</p>
+                        <p className="text-xs text-[#4B5563] md:hidden">
                           {r.type === 'manual' ? 'Bloqueio manual' : 'Reserva'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-[#1a1410]">{r.guest_name || r.reason || '—'}</p>
+                        <p className="text-sm text-[#111827]">{r.guest_name || r.reason || '—'}</p>
                         {r.guest_phone && (
-                          <p className="text-xs text-[#5a4f45]">{r.guest_phone}</p>
+                          <p className="text-xs text-[#4B5563]">{r.guest_phone}</p>
                         )}
                       </div>
-                      <div className="text-sm text-[#1a1410]">
-                        <span className="md:hidden text-xs text-[#5a4f45]">Check-in: </span>
+                      <div className="text-sm text-[#111827]">
+                        <span className="md:hidden text-xs text-[#4B5563]">Check-in: </span>
                         {formatDate(r.date_start)}
                       </div>
-                      <div className="text-sm text-[#1a1410]">
-                        <span className="md:hidden text-xs text-[#5a4f45]">Check-out: </span>
+                      <div className="text-sm text-[#111827]">
+                        <span className="md:hidden text-xs text-[#4B5563]">Check-out: </span>
                         {formatDate(r.date_end)}
                       </div>
                       <div>
@@ -1067,7 +1067,7 @@ export default function AdminPage() {
                   setBlockStart(null);
                   setBlockEnd(null);
                 }}
-                className="px-4 py-2.5 bg-white border border-[#d4c9b8] rounded-lg text-sm text-[#1a1410] focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 min-w-[220px]"
+                className="px-4 py-2.5 bg-white border border-[#BFDBFE] rounded-lg text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 min-w-[220px]"
               >
                 <option value="">Selecione um imóvel</option>
                 {properties.map(p => (
@@ -1078,13 +1078,13 @@ export default function AdminPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => navigateMonth(-1)}
-                    className="p-2 bg-white border border-[#d4c9b8] rounded-lg hover:bg-[#F7F2EB] transition-colors"
+                    className="p-2 bg-white border border-[#BFDBFE] rounded-lg hover:bg-[#F8FAFC] transition-colors"
                   >
                     ←
                   </button>
                   <button
                     onClick={() => navigateMonth(1)}
-                    className="p-2 bg-white border border-[#d4c9b8] rounded-lg hover:bg-[#F7F2EB] transition-colors"
+                    className="p-2 bg-white border border-[#BFDBFE] rounded-lg hover:bg-[#F8FAFC] transition-colors"
                   >
                     →
                   </button>
@@ -1093,32 +1093,32 @@ export default function AdminPage() {
             </div>
 
             {!calendarProperty ? (
-              <div className="text-center py-16 text-[#5a4f45]">
+              <div className="text-center py-16 text-[#4B5563]">
                 <p className="text-lg">Selecione um imóvel para ver o calendário</p>
               </div>
             ) : (
               <>
                 {/* Two-month calendar */}
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl border border-[#d4c9b8] p-5">
+                  <div className="bg-white rounded-xl border border-[#BFDBFE] p-5">
                     {renderMonth(calendarYear, calendarMonth)}
                   </div>
-                  <div className="bg-white rounded-xl border border-[#d4c9b8] p-5">
+                  <div className="bg-white rounded-xl border border-[#BFDBFE] p-5">
                     {renderMonth(getSecondMonth().year, getSecondMonth().month)}
                   </div>
                 </div>
 
                 {/* Selection hint */}
                 {blockStart && !blockEnd && (
-                  <div className="bg-[#AC4747]/10 border border-[#AC4747]/30 rounded-lg px-4 py-3 text-sm text-[#AC4747]">
+                  <div className="bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-lg px-4 py-3 text-sm text-[#2563EB]">
                     Início selecionado: <strong>{formatDate(blockStart)}</strong>. Clique em outro dia para definir o fim do bloqueio.
                   </div>
                 )}
 
                 {/* Legend */}
-                <div className="flex flex-wrap gap-4 text-xs text-[#5a4f45] bg-white rounded-xl border border-[#d4c9b8] p-4">
+                <div className="flex flex-wrap gap-4 text-xs text-[#4B5563] bg-white rounded-xl border border-[#BFDBFE] p-4">
                   <div className="flex items-center gap-2">
-                    <span className="w-4 h-4 rounded bg-white border border-[#d4c9b8]" />
+                    <span className="w-4 h-4 rounded bg-white border border-[#BFDBFE]" />
                     Disponível
                   </div>
                   <div className="flex items-center gap-2">
@@ -1134,7 +1134,7 @@ export default function AdminPage() {
                     Passado
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-4 h-4 rounded bg-[#AC4747]" />
+                    <span className="w-4 h-4 rounded bg-[#2563EB]" />
                     Selecionado
                   </div>
                 </div>
@@ -1145,24 +1145,24 @@ export default function AdminPage() {
             {showBlockModal && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
                 <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-                  <h3 className="font-serif text-lg font-bold text-[#1a1410] mb-4">
+                  <h3 className="font-serif text-lg font-bold text-[#111827] mb-4">
                     Criar bloqueio manual
                   </h3>
                   <div className="space-y-4">
-                    <div className="bg-[#F7F2EB] rounded-lg p-3 text-sm">
-                      <p className="text-[#5a4f45]">
-                        <span className="font-medium text-[#1a1410]">{getPropertyName(calendarProperty)}</span>
+                    <div className="bg-[#F8FAFC] rounded-lg p-3 text-sm">
+                      <p className="text-[#4B5563]">
+                        <span className="font-medium text-[#111827]">{getPropertyName(calendarProperty)}</span>
                       </p>
-                      <p className="text-[#5a4f45]">
+                      <p className="text-[#4B5563]">
                         {blockStart && formatDate(blockStart)} → {blockEnd && formatDate(blockEnd)}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Motivo</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Motivo</label>
                       <select
                         value={blockReason}
                         onChange={e => setBlockReason(e.target.value)}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       >
                         {BLOCK_REASONS.map(r => (
                           <option key={r.value} value={r.value}>{r.label}</option>
@@ -1170,13 +1170,13 @@ export default function AdminPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">
-                        Observações <span className="text-[#d4c9b8]">(opcional)</span>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">
+                        Observações <span className="text-[#BFDBFE]">(opcional)</span>
                       </label>
                       <textarea
                         value={blockNotes}
                         onChange={e => setBlockNotes(e.target.value)}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 resize-none"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 resize-none"
                         rows={2}
                       />
                     </div>
@@ -1187,14 +1187,14 @@ export default function AdminPage() {
                           setBlockStart(null);
                           setBlockEnd(null);
                         }}
-                        className="flex-1 py-2.5 bg-gray-100 text-[#5a4f45] rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                        className="flex-1 py-2.5 bg-gray-100 text-[#4B5563] rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
                       >
                         Cancelar
                       </button>
                       <button
                         onClick={handleCreateBlock}
                         disabled={actionLoading === 'block'}
-                        className="flex-1 py-2.5 bg-[#AC4747] text-white rounded-lg text-sm font-medium hover:bg-[#8a3636] transition-colors disabled:opacity-50"
+                        className="flex-1 py-2.5 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
                       >
                         {actionLoading === 'block' ? 'Salvando...' : 'Confirmar bloqueio'}
                       </button>
@@ -1208,24 +1208,24 @@ export default function AdminPage() {
             {showDayDetail && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
                 <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-                  <h3 className="font-serif text-lg font-bold text-[#1a1410] mb-4">
+                  <h3 className="font-serif text-lg font-bold text-[#111827] mb-4">
                     Detalhes do bloqueio
                   </h3>
                   <div className="space-y-3 text-sm">
-                    <div className="bg-[#F7F2EB] rounded-lg p-3">
-                      <p className="text-[#5a4f45]">
-                        <span className="font-medium text-[#1a1410]">{getPropertyName(showDayDetail.property_id)}</span>
+                    <div className="bg-[#F8FAFC] rounded-lg p-3">
+                      <p className="text-[#4B5563]">
+                        <span className="font-medium text-[#111827]">{getPropertyName(showDayDetail.property_id)}</span>
                       </p>
-                      <p className="text-[#5a4f45]">
+                      <p className="text-[#4B5563]">
                         {formatDate(showDayDetail.date_start)} → {formatDate(showDayDetail.date_end)}
                       </p>
                     </div>
                     <p>
-                      <span className="text-[#5a4f45]">Tipo:</span>{' '}
+                      <span className="text-[#4B5563]">Tipo:</span>{' '}
                       {showDayDetail.type === 'manual' ? 'Bloqueio manual' : 'Reserva de hóspede'}
                     </p>
                     <p>
-                      <span className="text-[#5a4f45]">Status:</span>{' '}
+                      <span className="text-[#4B5563]">Status:</span>{' '}
                       <span className={`font-medium ${
                         showDayDetail.status === 'approved' ? 'text-emerald-600' :
                         showDayDetail.status === 'pending' ? 'text-amber-600' : 'text-gray-600'
@@ -1235,22 +1235,22 @@ export default function AdminPage() {
                       </span>
                     </p>
                     {showDayDetail.guest_name && (
-                      <p><span className="text-[#5a4f45]">Hóspede:</span> {showDayDetail.guest_name}</p>
+                      <p><span className="text-[#4B5563]">Hóspede:</span> {showDayDetail.guest_name}</p>
                     )}
                     {showDayDetail.guest_phone && (
-                      <p><span className="text-[#5a4f45]">Telefone:</span> {showDayDetail.guest_phone}</p>
+                      <p><span className="text-[#4B5563]">Telefone:</span> {showDayDetail.guest_phone}</p>
                     )}
                     {showDayDetail.reason && (
-                      <p><span className="text-[#5a4f45]">Motivo:</span> {showDayDetail.reason}</p>
+                      <p><span className="text-[#4B5563]">Motivo:</span> {showDayDetail.reason}</p>
                     )}
                     {showDayDetail.admin_notes && (
-                      <p><span className="text-[#5a4f45]">Obs:</span> {showDayDetail.admin_notes}</p>
+                      <p><span className="text-[#4B5563]">Obs:</span> {showDayDetail.admin_notes}</p>
                     )}
                   </div>
                   <div className="flex gap-3 mt-6">
                     <button
                       onClick={() => setShowDayDetail(null)}
-                      className="flex-1 py-2.5 bg-gray-100 text-[#5a4f45] rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                      className="flex-1 py-2.5 bg-gray-100 text-[#4B5563] rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
                     >
                       Fechar
                     </button>
@@ -1280,13 +1280,13 @@ export default function AdminPage() {
         {/* ─── TAB: PRECOS ─── */}
         {!loading && activeTab === 'precos' && (
           <div className="space-y-6">
-            <h2 className="font-serif text-xl font-bold text-[#1a1410]">Gestão de Preços</h2>
+            <h2 className="font-serif text-xl font-bold text-[#111827]">Gestão de Preços</h2>
 
             {/* Property selector */}
             <select
               value={pricingProperty}
               onChange={e => setPricingProperty(e.target.value)}
-              className="w-full sm:w-64 px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+              className="w-full sm:w-64 px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
             >
               <option value="">Selecione um imóvel</option>
               {properties.filter(p => p.active).map(p => (
@@ -1295,7 +1295,7 @@ export default function AdminPage() {
             </select>
 
             {pricingProperty && pricingLoading && (
-              <div className="text-center py-8 text-[#5a4f45]">Carregando...</div>
+              <div className="text-center py-8 text-[#4B5563]">Carregando...</div>
             )}
 
             {pricingProperty && !pricingLoading && (
@@ -1303,10 +1303,10 @@ export default function AdminPage() {
                 {/* Left column: Rules */}
                 <div className="space-y-4">
                   {/* Base price */}
-                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
-                    <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Preço base</h3>
+                  <div className="bg-white border border-[#BFDBFE] rounded-xl p-4">
+                    <h3 className="font-serif text-base font-bold text-[#111827] mb-3">Preço base</h3>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-[#5a4f45]">R$</span>
+                      <span className="text-sm text-[#4B5563]">R$</span>
                       <input
                         type="number"
                         value={localPrices['base'] ?? ''}
@@ -1317,17 +1317,17 @@ export default function AdminPage() {
                           debouncedSavePricingRule('base', { id: existing?.id, rule_type: 'base', price_per_night: val });
                         }}
                         placeholder="0"
-                        className="w-32 px-3 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-32 px-3 py-2 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
-                      <span className="text-sm text-[#5a4f45]">/ noite</span>
+                      <span className="text-sm text-[#4B5563]">/ noite</span>
                     </div>
                   </div>
 
                   {/* Weekend price */}
-                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
-                    <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Fim de semana</h3>
+                  <div className="bg-white border border-[#BFDBFE] rounded-xl p-4">
+                    <h3 className="font-serif text-base font-bold text-[#111827] mb-3">Fim de semana</h3>
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-sm text-[#5a4f45]">R$</span>
+                      <span className="text-sm text-[#4B5563]">R$</span>
                       <input
                         type="number"
                         value={localPrices['weekend'] ?? ''}
@@ -1338,9 +1338,9 @@ export default function AdminPage() {
                           debouncedSavePricingRule('weekend', { id: existing?.id, rule_type: 'weekend', price_per_night: val, weekend_days: existing?.weekend_days || [5, 6] });
                         }}
                         placeholder="0"
-                        className="w-32 px-3 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-32 px-3 py-2 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
-                      <span className="text-sm text-[#5a4f45]">/ noite</span>
+                      <span className="text-sm text-[#4B5563]">/ noite</span>
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d, i) => {
@@ -1348,7 +1348,7 @@ export default function AdminPage() {
                         const days = weekendRule?.weekend_days || [5, 6];
                         const checked = days.includes(i);
                         return (
-                          <label key={i} className="flex items-center gap-1 text-xs text-[#5a4f45]">
+                          <label key={i} className="flex items-center gap-1 text-xs text-[#4B5563]">
                             <input
                               type="checkbox"
                               checked={checked}
@@ -1358,7 +1358,7 @@ export default function AdminPage() {
                                   savePricingRule({ id: weekendRule.id, rule_type: 'weekend', price_per_night: weekendRule.price_per_night, weekend_days: newDays });
                                 }
                               }}
-                              className="rounded border-[#d4c9b8]"
+                              className="rounded border-[#BFDBFE]"
                             />
                             {d}
                           </label>
@@ -1368,10 +1368,10 @@ export default function AdminPage() {
                   </div>
 
                   {/* Guest surcharge */}
-                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
-                    <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Extra por hóspede</h3>
+                  <div className="bg-white border border-[#BFDBFE] rounded-xl p-4">
+                    <h3 className="font-serif text-base font-bold text-[#111827] mb-3">Extra por hóspede</h3>
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm text-[#5a4f45]">A partir de</span>
+                      <span className="text-sm text-[#4B5563]">A partir de</span>
                       <input
                         type="number"
                         value={localPrices['min_guests'] ?? ''}
@@ -1386,9 +1386,9 @@ export default function AdminPage() {
                           });
                         }}
                         placeholder="0"
-                        className="w-20 px-2 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-20 px-2 py-2 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
-                      <span className="text-sm text-[#5a4f45]">pessoas, + R$</span>
+                      <span className="text-sm text-[#4B5563]">pessoas, + R$</span>
                       <input
                         type="number"
                         value={localPrices['price_extra'] ?? ''}
@@ -1403,25 +1403,25 @@ export default function AdminPage() {
                           });
                         }}
                         placeholder="0"
-                        className="w-20 px-2 py-2 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-20 px-2 py-2 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
-                      <span className="text-sm text-[#5a4f45]">/ pessoa / noite</span>
+                      <span className="text-sm text-[#4B5563]">/ pessoa / noite</span>
                     </div>
                   </div>
 
                   {/* Seasonal rules */}
-                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                  <div className="bg-white border border-[#BFDBFE] rounded-xl p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-serif text-base font-bold text-[#1a1410]">Temporadas</h3>
+                      <h3 className="font-serif text-base font-bold text-[#111827]">Temporadas</h3>
                       <button
                         onClick={() => savePricingRule({ rule_type: 'seasonal', price_per_night: 0, season_start_month: 12, season_start_day: 15, season_end_month: 1, season_end_day: 31, label: 'Nova temporada' })}
-                        className="text-xs px-3 py-1.5 bg-[#AC4747] text-white rounded-lg hover:bg-[#8a3636] transition-colors"
+                        className="text-xs px-3 py-1.5 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors"
                       >
                         + Adicionar
                       </button>
                     </div>
                     {pricingRules.filter(r => r.rule_type === 'seasonal').map(rule => (
-                      <div key={rule.id} className="border border-[#d4c9b8]/50 rounded-lg p-3 mb-2 space-y-2">
+                      <div key={rule.id} className="border border-[#BFDBFE]/50 rounded-lg p-3 mb-2 space-y-2">
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
@@ -1431,56 +1431,56 @@ export default function AdminPage() {
                               debouncedSavePricingRule(`seasonal_label_${rule.id}`, { id: rule.id, rule_type: 'seasonal', label: e.target.value });
                             }}
                             placeholder="Nome da temporada"
-                            className="flex-1 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                            className="flex-1 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                           />
                           <button onClick={() => deletePricingRuleHandler(rule.id)} className="text-red-500 text-sm hover:text-red-700">✕</button>
                         </div>
-                        <div className="flex flex-wrap items-center gap-2 text-sm text-[#5a4f45]">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-[#4B5563]">
                           <span>De</span>
-                          <select value={rule.season_start_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_start_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm">
+                          <select value={rule.season_start_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_start_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#BFDBFE] rounded text-sm">
                             {MONTHS_PT.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                           </select>
                           <input type="number" min={1} max={31} value={localPrices[`seasonal_start_day_${rule.id}`] ?? rule.season_start_day ?? 1} onChange={e => {
                             setLocalPrices(prev => ({ ...prev, [`seasonal_start_day_${rule.id}`]: e.target.value }));
                             debouncedSavePricingRule(`seasonal_start_day_${rule.id}`, { id: rule.id, rule_type: 'seasonal', season_start_day: parseInt(e.target.value) });
-                          }} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          }} className="w-14 px-2 py-1 border border-[#BFDBFE] rounded text-sm" />
                           <span>até</span>
-                          <select value={rule.season_end_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_end_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm">
+                          <select value={rule.season_end_month || 1} onChange={e => savePricingRule({ id: rule.id, rule_type: 'seasonal', season_end_month: parseInt(e.target.value) })} className="px-2 py-1 border border-[#BFDBFE] rounded text-sm">
                             {MONTHS_PT.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                           </select>
                           <input type="number" min={1} max={31} value={localPrices[`seasonal_end_day_${rule.id}`] ?? rule.season_end_day ?? 31} onChange={e => {
                             setLocalPrices(prev => ({ ...prev, [`seasonal_end_day_${rule.id}`]: e.target.value }));
                             debouncedSavePricingRule(`seasonal_end_day_${rule.id}`, { id: rule.id, rule_type: 'seasonal', season_end_day: parseInt(e.target.value) });
-                          }} className="w-14 px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          }} className="w-14 px-2 py-1 border border-[#BFDBFE] rounded text-sm" />
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-[#5a4f45]">R$</span>
+                          <span className="text-sm text-[#4B5563]">R$</span>
                           <input type="number" value={localPrices[`seasonal_${rule.id}`] ?? ''} onChange={e => {
                             setLocalPrices(prev => ({ ...prev, [`seasonal_${rule.id}`]: e.target.value }));
                             debouncedSavePricingRule(`seasonal_${rule.id}`, { id: rule.id, rule_type: 'seasonal', price_per_night: parseInt(e.target.value) || 0 });
-                          }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
-                          <span className="text-sm text-[#5a4f45]">/ noite</span>
+                          }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40" />
+                          <span className="text-sm text-[#4B5563]">/ noite</span>
                         </div>
                       </div>
                     ))}
                     {pricingRules.filter(r => r.rule_type === 'seasonal').length === 0 && (
-                      <p className="text-sm text-[#d4c9b8]">Nenhuma temporada configurada</p>
+                      <p className="text-sm text-[#BFDBFE]">Nenhuma temporada configurada</p>
                     )}
                   </div>
 
                   {/* Custom date overrides */}
-                  <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
+                  <div className="bg-white border border-[#BFDBFE] rounded-xl p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-serif text-base font-bold text-[#1a1410]">Datas customizadas</h3>
+                      <h3 className="font-serif text-base font-bold text-[#111827]">Datas customizadas</h3>
                       <button
                         onClick={() => savePricingRule({ rule_type: 'custom', price_per_night: 0, date_start: toISODate(pricingYear, pricingMonth, 1), date_end: toISODate(pricingYear, pricingMonth, 7), label: 'Evento especial', priority: 10 })}
-                        className="text-xs px-3 py-1.5 bg-[#AC4747] text-white rounded-lg hover:bg-[#8a3636] transition-colors"
+                        className="text-xs px-3 py-1.5 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors"
                       >
                         + Adicionar
                       </button>
                     </div>
                     {pricingRules.filter(r => r.rule_type === 'custom').map(rule => (
-                      <div key={rule.id} className="border border-[#d4c9b8]/50 rounded-lg p-3 mb-2 space-y-2">
+                      <div key={rule.id} className="border border-[#BFDBFE]/50 rounded-lg p-3 mb-2 space-y-2">
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
@@ -1490,53 +1490,53 @@ export default function AdminPage() {
                               debouncedSavePricingRule(`custom_label_${rule.id}`, { id: rule.id, rule_type: 'custom', label: e.target.value });
                             }}
                             placeholder="Nome (ex: Réveillon)"
-                            className="flex-1 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                            className="flex-1 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                           />
                           <button onClick={() => deletePricingRuleHandler(rule.id)} className="text-red-500 text-sm hover:text-red-700">✕</button>
                         </div>
-                        <div className="flex flex-wrap items-center gap-2 text-sm text-[#5a4f45]">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-[#4B5563]">
                           <span>De</span>
-                          <input type="date" value={rule.date_start || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', date_start: e.target.value })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          <input type="date" value={rule.date_start || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', date_start: e.target.value })} className="px-2 py-1 border border-[#BFDBFE] rounded text-sm" />
                           <span>até</span>
-                          <input type="date" value={rule.date_end || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', date_end: e.target.value })} className="px-2 py-1 border border-[#d4c9b8] rounded text-sm" />
+                          <input type="date" value={rule.date_end || ''} onChange={e => savePricingRule({ id: rule.id, rule_type: 'custom', date_end: e.target.value })} className="px-2 py-1 border border-[#BFDBFE] rounded text-sm" />
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-[#5a4f45]">R$</span>
+                          <span className="text-sm text-[#4B5563]">R$</span>
                           <input type="number" value={localPrices[`custom_${rule.id}`] ?? ''} onChange={e => {
                             setLocalPrices(prev => ({ ...prev, [`custom_${rule.id}`]: e.target.value }));
                             debouncedSavePricingRule(`custom_${rule.id}`, { id: rule.id, rule_type: 'custom', price_per_night: parseInt(e.target.value) || 0 });
-                          }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#d4c9b8] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40" />
-                          <span className="text-sm text-[#5a4f45]">/ noite</span>
+                          }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40" />
+                          <span className="text-sm text-[#4B5563]">/ noite</span>
                         </div>
                       </div>
                     ))}
                     {pricingRules.filter(r => r.rule_type === 'custom').length === 0 && (
-                      <p className="text-sm text-[#d4c9b8]">Nenhuma data customizada</p>
+                      <p className="text-sm text-[#BFDBFE]">Nenhuma data customizada</p>
                     )}
                   </div>
                 </div>
 
                 {/* Right column: Pricing calendar preview */}
-                <div className="bg-white border border-[#d4c9b8] rounded-xl p-4">
-                  <h3 className="font-serif text-base font-bold text-[#1a1410] mb-3">Calendário de preços</h3>
+                <div className="bg-white border border-[#BFDBFE] rounded-xl p-4">
+                  <h3 className="font-serif text-base font-bold text-[#111827] mb-3">Calendário de preços</h3>
 
                   {/* Month navigation */}
                   <div className="flex items-center justify-between mb-3">
                     <button
                       onClick={() => { if (pricingMonth === 0) { setPricingMonth(11); setPricingYear(y => y - 1); } else setPricingMonth(m => m - 1); }}
-                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F7F2EB] text-[#5a4f45]"
+                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F8FAFC] text-[#4B5563]"
                     >←</button>
-                    <span className="font-serif text-base text-[#1a1410]">{MONTHS_PT[pricingMonth]} {pricingYear}</span>
+                    <span className="font-serif text-base text-[#111827]">{MONTHS_PT[pricingMonth]} {pricingYear}</span>
                     <button
                       onClick={() => { if (pricingMonth === 11) { setPricingMonth(0); setPricingYear(y => y + 1); } else setPricingMonth(m => m + 1); }}
-                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F7F2EB] text-[#5a4f45]"
+                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F8FAFC] text-[#4B5563]"
                     >→</button>
                   </div>
 
                   {/* Day labels */}
                   <div className="grid grid-cols-7 gap-0.5 mb-1">
                     {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
-                      <div key={i} className="text-center text-xs font-semibold text-[#5a4f45] py-1">{d}</div>
+                      <div key={i} className="text-center text-xs font-semibold text-[#4B5563] py-1">{d}</div>
                     ))}
                   </div>
 
@@ -1563,9 +1563,9 @@ export default function AdminPage() {
                             className={`aspect-square flex flex-col items-center justify-center rounded-lg border text-xs ${bgColor} transition-colors`}
                             title={priceInfo ? `${priceInfo.label}: R$${priceInfo.price}` : 'Sem preço configurado'}
                           >
-                            <span className="font-medium text-[#1a1410]">{day}</span>
+                            <span className="font-medium text-[#111827]">{day}</span>
                             {priceInfo && (
-                              <span className="text-[10px] text-[#5a4f45] leading-none mt-0.5">
+                              <span className="text-[10px] text-[#4B5563] leading-none mt-0.5">
                                 {priceInfo.price}
                               </span>
                             )}
@@ -1576,8 +1576,8 @@ export default function AdminPage() {
                   </div>
 
                   {/* Legend */}
-                  <div className="flex flex-wrap gap-3 mt-4 text-xs text-[#5a4f45]">
-                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-white border border-[#d4c9b8]" /> Base</div>
+                  <div className="flex flex-wrap gap-3 mt-4 text-xs text-[#4B5563]">
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-white border border-[#BFDBFE]" /> Base</div>
                     <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-50 border border-blue-200" /> Fim de semana</div>
                     <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-50 border border-green-200" /> Temporada</div>
                     <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-purple-50 border border-purple-200" /> Customizado</div>
@@ -1587,7 +1587,7 @@ export default function AdminPage() {
             )}
 
             {!pricingProperty && (
-              <div className="text-center py-16 text-[#d4c9b8]">
+              <div className="text-center py-16 text-[#BFDBFE]">
                 <p className="font-serif text-lg">Selecione um imóvel para gerenciar preços</p>
               </div>
             )}
@@ -1598,10 +1598,10 @@ export default function AdminPage() {
         {!loading && activeTab === 'imoveis' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-serif text-xl font-bold text-[#1a1410]">Imóveis</h2>
+              <h2 className="font-serif text-xl font-bold text-[#111827]">Imóveis</h2>
               <button
                 onClick={openNewProperty}
-                className="px-4 py-2.5 bg-[#AC4747] text-white rounded-lg text-sm font-medium hover:bg-[#8a3636] transition-colors"
+                className="px-4 py-2.5 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors"
               >
                 + Adicionar imóvel
               </button>
@@ -1615,7 +1615,7 @@ export default function AdminPage() {
                   <div
                     key={p.id}
                     onClick={() => openEditProperty(p)}
-                    className="bg-white rounded-xl border border-[#d4c9b8] overflow-hidden cursor-pointer hover:shadow-lg transition-shadow group"
+                    className="bg-white rounded-xl border border-[#BFDBFE] overflow-hidden cursor-pointer hover:shadow-lg transition-shadow group"
                   >
                     {imgs[0] ? (
                       <div className="h-40 overflow-hidden">
@@ -1626,15 +1626,15 @@ export default function AdminPage() {
                         />
                       </div>
                     ) : (
-                      <div className="h-40 bg-[#F7F2EB] flex items-center justify-center text-[#d4c9b8]">
+                      <div className="h-40 bg-[#F8FAFC] flex items-center justify-center text-[#BFDBFE]">
                         <span className="text-4xl">🏠</span>
                       </div>
                     )}
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h3 className="font-semibold text-[#1a1410] text-sm">{p.name}</h3>
-                          <p className="text-xs text-[#5a4f45]">{p.location}</p>
+                          <h3 className="font-semibold text-[#111827] text-sm">{p.name}</h3>
+                          <p className="text-xs text-[#4B5563]">{p.location}</p>
                         </div>
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                           p.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
@@ -1643,11 +1643,11 @@ export default function AdminPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs bg-[#AC4747]/10 text-[#AC4747] px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-[#2563EB]/10 text-[#2563EB] px-2 py-0.5 rounded-full">
                           {p.type}
                         </span>
                         {p.price && (
-                          <span className="text-sm font-semibold text-[#1a1410]">
+                          <span className="text-sm font-semibold text-[#111827]">
                             R$ {p.price}{p.price_unit ? `/${p.price_unit}` : ''}
                           </span>
                         )}
@@ -1663,12 +1663,12 @@ export default function AdminPage() {
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
                 <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 my-8 max-h-[90vh] overflow-y-auto">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-serif text-xl font-bold text-[#1a1410]">
+                    <h3 className="font-serif text-xl font-bold text-[#111827]">
                       {editingProperty ? 'Editar imóvel' : 'Novo imóvel'}
                     </h3>
                     <button
                       onClick={() => { setShowPropertyForm(false); setEditingProperty(null); }}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-[#5a4f45]"
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-[#4B5563]"
                     >
                       ✕
                     </button>
@@ -1677,7 +1677,7 @@ export default function AdminPage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     {/* ID / Slug */}
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">
                         ID (slug)
                       </label>
                       <input
@@ -1686,39 +1686,39 @@ export default function AdminPage() {
                         onChange={e => setPropertyForm(f => ({ ...f, id: e.target.value }))}
                         disabled={!!editingProperty}
                         placeholder="meu-imovel"
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 disabled:bg-gray-50 disabled:text-gray-400"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 disabled:bg-gray-50 disabled:text-gray-400"
                       />
                     </div>
 
                     {/* Name */}
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Nome</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Nome</label>
                       <input
                         type="text"
                         value={propertyForm.name}
                         onChange={e => setPropertyForm(f => ({ ...f, name: e.target.value }))}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
 
                     {/* Location */}
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Localização</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Localização</label>
                       <input
                         type="text"
                         value={propertyForm.location}
                         onChange={e => setPropertyForm(f => ({ ...f, location: e.target.value }))}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
 
                     {/* Type */}
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Tipo</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Tipo</label>
                       <select
                         value={propertyForm.type}
                         onChange={e => setPropertyForm(f => ({ ...f, type: e.target.value }))}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       >
                         {PROPERTY_TYPES.map(t => (
                           <option key={t.value} value={t.value}>{t.label}</option>
@@ -1728,91 +1728,91 @@ export default function AdminPage() {
 
                     {/* Badge */}
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Badge</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Badge</label>
                       <input
                         type="text"
                         value={propertyForm.badge}
                         onChange={e => setPropertyForm(f => ({ ...f, badge: e.target.value }))}
                         placeholder="Ex: Mais vendido"
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
 
                     {/* Price */}
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Preço</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Preço</label>
                       <input
                         type="text"
                         value={propertyForm.price}
                         onChange={e => setPropertyForm(f => ({ ...f, price: e.target.value }))}
                         placeholder="1.500"
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
 
                     {/* Price unit */}
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Unidade de preço</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Unidade de preço</label>
                       <input
                         type="text"
                         value={propertyForm.price_unit}
                         onChange={e => setPropertyForm(f => ({ ...f, price_unit: e.target.value }))}
                         placeholder="diária, noite, mês"
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
 
                     {/* Guests */}
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Hóspedes</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Hóspedes</label>
                       <input
                         type="text"
                         value={propertyForm.guests}
                         onChange={e => setPropertyForm(f => ({ ...f, guests: e.target.value }))}
                         placeholder="Até 20 pessoas"
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
 
                     {/* Sort order */}
                     <div>
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Ordem</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Ordem</label>
                       <input
                         type="number"
                         value={propertyForm.sort_order}
                         onChange={e => setPropertyForm(f => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
 
                     {/* Description */}
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">Descrição</label>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">Descrição</label>
                       <textarea
                         value={propertyForm.description}
                         onChange={e => setPropertyForm(f => ({ ...f, description: e.target.value }))}
                         rows={3}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 resize-none"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 resize-none"
                       />
                     </div>
 
                     {/* Features */}
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">
-                        Características <span className="text-[#d4c9b8] font-normal">(uma por linha)</span>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">
+                        Características <span className="text-[#BFDBFE] font-normal">(uma por linha)</span>
                       </label>
                       <textarea
                         value={propertyForm.features}
                         onChange={e => setPropertyForm(f => ({ ...f, features: e.target.value }))}
                         rows={4}
                         placeholder={"Piscina aquecida\nChurrasqueira\nWi-Fi"}
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 resize-none font-mono"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 resize-none font-mono"
                       />
                     </div>
 
                     {/* Images — Upload + URLs */}
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-[#5a4f45] mb-1">
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">
                         Imagens
                       </label>
 
@@ -1853,7 +1853,7 @@ export default function AdminPage() {
                           type="button"
                           onClick={() => document.getElementById('image-upload')?.click()}
                           disabled={uploadingImages}
-                          className="px-4 py-2 bg-[#AC4747] text-white rounded-lg text-sm font-medium hover:bg-[#8a3636] transition-colors disabled:opacity-50 flex items-center gap-2"
+                          className="px-4 py-2 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors disabled:opacity-50 flex items-center gap-2"
                         >
                           {uploadingImages ? (
                             <>
@@ -1873,7 +1873,7 @@ export default function AdminPage() {
                       {propertyForm.images.trim() && (
                         <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-3">
                           {propertyForm.images.split('\n').map(u => u.trim()).filter(Boolean).map((url, i) => (
-                            <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-[#d4c9b8]">
+                            <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-[#BFDBFE]">
                               <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
                               <button
                                 type="button"
@@ -1897,7 +1897,7 @@ export default function AdminPage() {
                         onChange={e => setPropertyForm(f => ({ ...f, images: e.target.value }))}
                         rows={3}
                         placeholder="Ou cole URLs de imagens (uma por linha)"
-                        className="w-full px-3 py-2.5 border border-[#d4c9b8] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#AC4747]/40 resize-none font-mono text-[#5a4f45]"
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 resize-none font-mono text-[#4B5563]"
                       />
                     </div>
 
@@ -1914,14 +1914,14 @@ export default function AdminPage() {
                           propertyForm.active ? 'translate-x-6' : ''
                         }`} />
                       </button>
-                      <span className="text-sm text-[#5a4f45]">
+                      <span className="text-sm text-[#4B5563]">
                         {propertyForm.active ? 'Ativo' : 'Inativo'}
                       </span>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-3 mt-8 pt-4 border-t border-[#d4c9b8]">
+                  <div className="flex gap-3 mt-8 pt-4 border-t border-[#BFDBFE]">
                     {editingProperty && (
                       <button
                         onClick={handleDeleteProperty}
@@ -1934,14 +1934,14 @@ export default function AdminPage() {
                     <div className="flex-1" />
                     <button
                       onClick={() => { setShowPropertyForm(false); setEditingProperty(null); }}
-                      className="px-4 py-2.5 bg-gray-100 text-[#5a4f45] rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                      className="px-4 py-2.5 bg-gray-100 text-[#4B5563] rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
                     >
                       Cancelar
                     </button>
                     <button
                       onClick={handleSaveProperty}
                       disabled={actionLoading === 'property' || !propertyForm.id || !propertyForm.name}
-                      className="px-6 py-2.5 bg-[#AC4747] text-white rounded-lg text-sm font-medium hover:bg-[#8a3636] transition-colors disabled:opacity-50"
+                      className="px-6 py-2.5 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
                     >
                       {actionLoading === 'property' ? 'Salvando...' : 'Salvar'}
                     </button>

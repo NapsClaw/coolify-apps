@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${playfair.variable} ${jakarta.variable}`}>
-      <body className="font-sans bg-[#F7F2EB] text-[#1a1410] overflow-x-hidden">
+      <body className="font-sans bg-[#F8FAFC] text-[#111827] overflow-x-hidden">
         {children}
       </body>
     </html>

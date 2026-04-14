@@ -28,7 +28,7 @@ export default function PropertyCard({ property, onOpen }: PropertyCardProps) {
 
         {/* Badge */}
         {property.badge && (
-          <span className="absolute top-3 left-3 bg-[#AC4747] text-white text-xs font-sans font-semibold px-3 py-1.5 rounded-full">
+          <span className="absolute top-3 left-3 bg-[#2563EB] text-white text-xs font-sans font-semibold px-3 py-1.5 rounded-full">
             {property.badge}
           </span>
         )}
@@ -42,13 +42,13 @@ export default function PropertyCard({ property, onOpen }: PropertyCardProps) {
 
       {/* Body */}
       <div className="p-5 flex flex-col flex-1 gap-3">
-        <h3 className="font-serif text-xl text-[#1a1410] leading-snug">
+        <h3 className="font-serif text-xl text-[#111827] leading-snug">
           {property.name}
         </h3>
 
-        <p className="text-[#5a4f45] font-sans text-sm flex items-center gap-1.5">
+        <p className="text-[#4B5563] font-sans text-sm flex items-center gap-1.5">
           <svg
-            className="w-4 h-4 text-[#AC4747]"
+            className="w-4 h-4 text-[#2563EB]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -74,7 +74,7 @@ export default function PropertyCard({ property, onOpen }: PropertyCardProps) {
           {(property.features || []).slice(0, 3).map((feature, i) => (
             <span
               key={i}
-              className="bg-[#F7F2EB] text-[#5a4f45] text-xs font-sans px-2.5 py-1 rounded-full"
+              className="bg-[#F8FAFC] text-[#4B5563] text-xs font-sans px-2.5 py-1 rounded-full"
             >
               {feature}
             </span>
@@ -82,22 +82,22 @@ export default function PropertyCard({ property, onOpen }: PropertyCardProps) {
         </div>
 
         {/* Price */}
-        <div className="mt-auto pt-3 border-t border-[#d4c9b8]/40">
+        <div className="mt-auto pt-3 border-t border-[#BFDBFE]/40">
           {property.base_price ? (
             <>
-              <span className="text-[#5a4f45] font-sans text-xs">a partir de </span>
-              <span className="font-serif text-xl text-[#AC4747] font-bold">
+              <span className="text-[#4B5563] font-sans text-xs">a partir de </span>
+              <span className="font-serif text-xl text-[#2563EB] font-bold">
                 R$ {property.base_price.toLocaleString('pt-BR')}
               </span>
-              <span className="text-[#5a4f45] font-sans text-sm ml-1">/noite</span>
+              <span className="text-[#4B5563] font-sans text-sm ml-1">/noite</span>
             </>
           ) : (
             <>
-              <span className="font-serif text-xl text-[#AC4747] font-bold">
+              <span className="font-serif text-xl text-[#2563EB] font-bold">
                 {property.price}
               </span>
               {property.price_unit && (
-                <span className="text-[#5a4f45] font-sans text-sm ml-1">
+                <span className="text-[#4B5563] font-sans text-sm ml-1">
                   {property.price_unit}
                 </span>
               )}
@@ -109,7 +109,7 @@ export default function PropertyCard({ property, onOpen }: PropertyCardProps) {
         <div className="flex gap-2 mt-1">
           <button
             onClick={onOpen}
-            className="flex-1 bg-[#AC4747] hover:bg-[#8a3636] text-white font-sans font-semibold text-sm py-3 rounded-xl transition-colors"
+            className="flex-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-sans font-semibold text-sm py-3 rounded-xl transition-colors"
           >
             Ver calendário
           </button>

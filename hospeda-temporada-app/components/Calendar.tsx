@@ -100,7 +100,7 @@ export default function Calendar({
       "w-10 h-10 rounded-full flex items-center justify-center text-sm font-sans transition-all";
 
     if (isPast) {
-      return `${base} text-[#d4c9b8] line-through cursor-default`;
+      return `${base} text-[#BFDBFE] line-through cursor-default`;
     }
     if (isBlocked) {
       return `${base} bg-[#ef4444]/15 text-[#ef4444] line-through cursor-not-allowed`;
@@ -109,16 +109,16 @@ export default function Calendar({
       return `${base} bg-yellow-100 text-yellow-700 cursor-default`;
     }
     if (isStart || isEnd) {
-      return `${base} bg-[#AC4747] text-white font-bold cursor-pointer`;
+      return `${base} bg-[#2563EB] text-white font-bold cursor-pointer`;
     }
     if (isRange) {
-      return `${base} bg-[#AC4747]/15 text-[#AC4747] cursor-pointer`;
+      return `${base} bg-[#2563EB]/15 text-[#2563EB] cursor-pointer`;
     }
     // Free day
     if (mode === "select") {
-      return `${base} hover:bg-[#AC4747]/10 text-[#1a1410] cursor-pointer`;
+      return `${base} hover:bg-[#2563EB]/10 text-[#111827] cursor-pointer`;
     }
-    return `${base} text-[#1a1410] cursor-default`;
+    return `${base} text-[#111827] cursor-default`;
   }
 
   function handleDayClick(day: number) {
@@ -136,19 +136,19 @@ export default function Calendar({
       <div className="flex items-center justify-between">
         <button
           onClick={prevMonth}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#F7F2EB] text-[#5a4f45] transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#F8FAFC] text-[#4B5563] transition-colors"
           aria-label="Mês anterior"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <span className="font-serif text-lg text-[#1a1410]">
+        <span className="font-serif text-lg text-[#111827]">
           {MONTH_NAMES[viewMonth]} {viewYear}
         </span>
         <button
           onClick={nextMonth}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#F7F2EB] text-[#5a4f45] transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#F8FAFC] text-[#4B5563] transition-colors"
           aria-label="Próximo mês"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ export default function Calendar({
         {DAY_LABELS.map((label) => (
           <div
             key={label}
-            className="text-center text-xs font-sans font-semibold text-[#5a4f45] py-1"
+            className="text-center text-xs font-sans font-semibold text-[#4B5563] py-1"
           >
             {label}
           </div>
@@ -195,7 +195,7 @@ export default function Calendar({
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-4 mt-2 text-xs font-sans text-[#5a4f45]">
+      <div className="flex flex-wrap gap-4 mt-2 text-xs font-sans text-[#4B5563]">
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
           Livre
@@ -205,7 +205,7 @@ export default function Calendar({
           Reservado
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#AC4747]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
           Selecionado
         </div>
       </div>

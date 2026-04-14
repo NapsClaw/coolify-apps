@@ -44,18 +44,18 @@ export default function PropertyGrid({ initialProperties: properties }: Property
   }, [properties, query, typeFilter]);
 
   return (
-    <section id="imoveis" className="bg-[#F7F2EB] py-16 px-6">
+    <section id="imoveis" className="bg-[#F8FAFC] py-16 px-6">
       <div className="max-w-6xl mx-auto flex flex-col gap-8">
         <SearchBar onFilter={handleFilter} />
 
         {filtered.length === 0 ? (
           <div className="text-center py-16">
-            <p className="font-sans text-[#5a4f45] text-lg">
+            <p className="font-sans text-[#4B5563] text-lg">
               Nenhum imóvel encontrado para sua busca.
             </p>
             <button
               onClick={() => handleFilter("", "")}
-              className="mt-4 text-[#AC4747] font-sans font-semibold hover:underline"
+              className="mt-4 text-[#2563EB] font-sans font-semibold hover:underline"
             >
               Limpar filtros
             </button>

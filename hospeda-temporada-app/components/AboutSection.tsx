@@ -1,6 +1,6 @@
 export default function AboutSection() {
   return (
-    <section className="bg-[#F7F2EB] py-20 px-6">
+    <section className="bg-[#F8FAFC] py-20 px-6">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10 items-center">
         {/* Image */}
         <div className="w-full md:w-1/2 flex-shrink-0">
@@ -14,15 +14,15 @@ export default function AboutSection() {
 
         {/* Text */}
         <div className="w-full md:w-1/2 flex flex-col gap-5">
-          <span className="inline-block bg-[#AC4747]/10 text-[#AC4747] text-sm font-sans font-semibold px-4 py-1.5 rounded-full w-fit">
+          <span className="inline-block bg-[#2563EB]/10 text-[#2563EB] text-sm font-sans font-semibold px-4 py-1.5 rounded-full w-fit">
             Sobre
           </span>
 
-          <h2 className="font-serif text-3xl sm:text-4xl text-[#1a1410] leading-tight">
+          <h2 className="font-serif text-3xl sm:text-4xl text-[#111827] leading-tight">
             Arlei — proprietário direto
           </h2>
 
-          <p className="text-[#5a4f45] font-sans text-base leading-relaxed">
+          <p className="text-[#4B5563] font-sans text-base leading-relaxed">
             Cuido pessoalmente de cada imóvel do portfólio. Sem intermediários,
             sem taxas ocultas. Você fala direto comigo pelo WhatsApp, escolhe as
             datas no calendário em tempo real e garante sua reserva em minutos.
@@ -40,7 +40,7 @@ export default function AboutSection() {
             ].map((chip) => (
               <span
                 key={chip}
-                className="bg-white text-[#1a1410] font-sans text-sm px-3 py-2 rounded-full shadow-sm"
+                className="bg-white text-[#111827] font-sans text-sm px-3 py-2 rounded-full shadow-sm"
               >
                 {chip}
               </span>

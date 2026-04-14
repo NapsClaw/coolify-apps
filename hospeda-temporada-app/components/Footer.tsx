@@ -1,11 +1,11 @@
 export default function Footer() {
   return (
-    <footer className="bg-[#1a1410] py-12 px-6">
+    <footer className="bg-[#111827] py-12 px-6">
       <div className="max-w-5xl mx-auto flex flex-col items-center gap-8">
         {/* Logo */}
         <div className="font-serif text-2xl text-white">
           Hospeda{" "}
-          <span className="text-[#AC4747]">Temporada</span>
+          <span className="text-[#2563EB]">Temporada</span>
         </div>
 
         {/* Links */}

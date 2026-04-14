@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --cream: #F7F2EB;
-  --terra: #AC4747;
-  --terra-dark: #8a3636;
-  --dark: #1a1410;
-  --mid: #5a4f45;
-  --light: #d4c9b8;
+  --cream: #F8FAFC;
+  --terra: #2563EB;
+  --terra-dark: #1D4ED8;
+  --dark: #111827;
+  --mid: #4B5563;
+  --light: #BFDBFE;
   --white: #ffffff;
   --green: #22c55e;
   --red: #ef4444;

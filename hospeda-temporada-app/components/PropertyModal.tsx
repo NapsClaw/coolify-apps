@@ -241,8 +241,8 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
                 onClick={() => setMainImage(i)}
                 className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-colors ${
                   i === mainImage
-                    ? "border-[#AC4747]"
-                    : "border-transparent hover:border-[#d4c9b8]"
+                    ? "border-[#2563EB]"
+                    : "border-transparent hover:border-[#BFDBFE]"
                 }`}
               >
                 <img
@@ -256,11 +256,11 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
         )}
 
         {/* Property details */}
-        <div className="px-5 py-4 flex flex-col gap-3 border-b border-[#d4c9b8]/30">
-          <h2 className="font-serif text-2xl text-[#1a1410]">{property.name}</h2>
+        <div className="px-5 py-4 flex flex-col gap-3 border-b border-[#BFDBFE]/30">
+          <h2 className="font-serif text-2xl text-[#111827]">{property.name}</h2>
 
-          <p className="text-[#5a4f45] font-sans text-sm flex items-center gap-1.5">
-            <svg className="w-4 h-4 text-[#AC4747]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <p className="text-[#4B5563] font-sans text-sm flex items-center gap-1.5">
+            <svg className="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -272,7 +272,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
             {(property.features || []).map((feature, i) => (
               <span
                 key={i}
-                className="bg-[#F7F2EB] text-[#5a4f45] text-xs font-sans px-2.5 py-1 rounded-full"
+                className="bg-[#F8FAFC] text-[#4B5563] text-xs font-sans px-2.5 py-1 rounded-full"
               >
                 {feature}
               </span>
@@ -281,18 +281,18 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
 
           {/* Description */}
           {property.description && (
-            <p className="text-[#5a4f45] font-sans text-sm leading-relaxed">
+            <p className="text-[#4B5563] font-sans text-sm leading-relaxed">
               {property.description}
             </p>
           )}
 
           {/* Price */}
           <div>
-            <span className="font-serif text-xl text-[#AC4747] font-bold">
+            <span className="font-serif text-xl text-[#2563EB] font-bold">
               {property.price}
             </span>
             {property.price_unit && (
-              <span className="text-[#5a4f45] font-sans text-sm ml-1">
+              <span className="text-[#4B5563] font-sans text-sm ml-1">
                 {property.price_unit}
               </span>
             )}
@@ -300,8 +300,8 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
         </div>
 
         {/* Calendar section */}
-        <div className="px-5 py-4 border-b border-[#d4c9b8]/30">
-          <h3 className="font-serif text-lg text-[#1a1410] mb-3">
+        <div className="px-5 py-4 border-b border-[#BFDBFE]/30">
+          <h3 className="font-serif text-lg text-[#111827] mb-3">
             Calendário de disponibilidade
           </h3>
           <Calendar
@@ -320,7 +320,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
               onChange={(e) =>
                 setFormData({ ...formData, pessoas: e.target.value })
               }
-              className="w-full border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747]"
+              className="w-full border border-[#BFDBFE] rounded-xl px-4 py-3 font-sans text-[#111827] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB]"
             >
               <option value="">Nº de pessoas</option>
               <option value="1-5">1-5</option>
@@ -333,34 +333,34 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
 
           {/* Dynamic price breakdown */}
           {priceLoading && (
-            <div className="bg-[#F7F2EB] rounded-xl p-4 mt-4 animate-pulse">
-              <div className="h-4 bg-[#d4c9b8]/40 rounded w-1/2 mb-2" />
-              <div className="h-6 bg-[#d4c9b8]/40 rounded w-1/3" />
+            <div className="bg-[#F8FAFC] rounded-xl p-4 mt-4 animate-pulse">
+              <div className="h-4 bg-[#BFDBFE]/40 rounded w-1/2 mb-2" />
+              <div className="h-6 bg-[#BFDBFE]/40 rounded w-1/3" />
             </div>
           )}
           {!priceLoading && priceBreakdown?.has_dynamic_pricing && priceBreakdown.total != null && (
-            <div className="bg-[#F7F2EB] rounded-xl p-4 mt-4 space-y-2">
+            <div className="bg-[#F8FAFC] rounded-xl p-4 mt-4 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="font-sans text-sm text-[#5a4f45]">
+                <span className="font-sans text-sm text-[#4B5563]">
                   {priceBreakdown.nights} {priceBreakdown.nights === 1 ? 'noite' : 'noites'}
                 </span>
-                <span className="font-sans text-sm text-[#1a1410]">
+                <span className="font-sans text-sm text-[#111827]">
                   R$ {priceBreakdown.subtotal?.toLocaleString('pt-BR')}
                 </span>
               </div>
               {priceBreakdown.guest_surcharge && priceBreakdown.guest_surcharge.total > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="font-sans text-sm text-[#5a4f45]">
+                  <span className="font-sans text-sm text-[#4B5563]">
                     +{priceBreakdown.guest_surcharge.extra_guests} hóspedes extras
                   </span>
-                  <span className="font-sans text-sm text-[#1a1410]">
+                  <span className="font-sans text-sm text-[#111827]">
                     R$ {priceBreakdown.guest_surcharge.total.toLocaleString('pt-BR')}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between items-center pt-2 border-t border-[#d4c9b8]/40">
-                <span className="font-serif text-base font-bold text-[#1a1410]">Total</span>
-                <span className="font-serif text-xl font-bold text-[#AC4747]">
+              <div className="flex justify-between items-center pt-2 border-t border-[#BFDBFE]/40">
+                <span className="font-serif text-base font-bold text-[#111827]">Total</span>
+                <span className="font-serif text-xl font-bold text-[#2563EB]">
                   R$ {priceBreakdown.total.toLocaleString('pt-BR')}
                 </span>
               </div>
@@ -370,21 +370,21 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
 
         {/* Reservation form */}
         <form onSubmit={handleSubmit} className="px-5 py-5 flex flex-col gap-4">
-          <h3 className="font-serif text-lg text-[#1a1410]">
+          <h3 className="font-serif text-lg text-[#111827]">
             Solicitar reserva
           </h3>
 
           {/* Check-in / Check-out display */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-[#F7F2EB] rounded-xl px-4 py-3">
-              <span className="text-xs font-sans text-[#5a4f45] block">Check-in</span>
-              <span className="font-sans font-semibold text-[#1a1410] text-sm">
+            <div className="bg-[#F8FAFC] rounded-xl px-4 py-3">
+              <span className="text-xs font-sans text-[#4B5563] block">Check-in</span>
+              <span className="font-sans font-semibold text-[#111827] text-sm">
                 {selectedStart || "Selecione no calendário"}
               </span>
             </div>
-            <div className="bg-[#F7F2EB] rounded-xl px-4 py-3">
-              <span className="text-xs font-sans text-[#5a4f45] block">Check-out</span>
-              <span className="font-sans font-semibold text-[#1a1410] text-sm">
+            <div className="bg-[#F8FAFC] rounded-xl px-4 py-3">
+              <span className="text-xs font-sans text-[#4B5563] block">Check-out</span>
+              <span className="font-sans font-semibold text-[#111827] text-sm">
                 {selectedEnd || "Selecione no calendário"}
               </span>
             </div>
@@ -399,7 +399,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
             onChange={(e) =>
               setFormData({ ...formData, nome: e.target.value })
             }
-            className="border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] text-sm placeholder:text-[#5a4f45]/50 focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747]"
+            className="border border-[#BFDBFE] rounded-xl px-4 py-3 font-sans text-[#111827] text-sm placeholder:text-[#4B5563]/50 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB]"
           />
 
           {/* WhatsApp */}
@@ -411,7 +411,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
             onChange={(e) =>
               setFormData({ ...formData, whatsapp: e.target.value })
             }
-            className="border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] text-sm placeholder:text-[#5a4f45]/50 focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747]"
+            className="border border-[#BFDBFE] rounded-xl px-4 py-3 font-sans text-[#111827] text-sm placeholder:text-[#4B5563]/50 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB]"
           />
 
           {/* Occasion */}
@@ -421,7 +421,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
             onChange={(e) =>
               setFormData({ ...formData, ocasiao: e.target.value })
             }
-            className="border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747]"
+            className="border border-[#BFDBFE] rounded-xl px-4 py-3 font-sans text-[#111827] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB]"
           >
             <option value="">Ocasião</option>
             <option value="Temporada/Férias">Temporada/Férias</option>
@@ -437,7 +437,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
           <button
             type="submit"
             disabled={!selectedStart || !selectedEnd || submitting}
-            className="bg-[#AC4747] hover:bg-[#8a3636] disabled:bg-[#d4c9b8] text-white font-sans font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+            className="bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#BFDBFE] text-white font-sans font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
           >
             {submitting ? (
               "Enviando..."

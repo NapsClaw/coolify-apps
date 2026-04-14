@@ -30,7 +30,7 @@ export default function SearchBar({ onFilter }: SearchBarProps) {
       onSubmit={handleSubmit}
       className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col gap-5"
     >
-      <h2 className="font-serif text-2xl sm:text-3xl text-[#1a1410]">
+      <h2 className="font-serif text-2xl sm:text-3xl text-[#111827]">
         Encontre seu imóvel ideal
       </h2>
 
@@ -41,14 +41,14 @@ export default function SearchBar({ onFilter }: SearchBarProps) {
           placeholder="Buscar por nome ou cidade..."
           value={query}
           onChange={(e) => handleQueryChange(e.target.value)}
-          className="flex-1 border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] placeholder:text-[#5a4f45]/50 focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747] transition-colors"
+          className="flex-1 border border-[#BFDBFE] rounded-xl px-4 py-3 font-sans text-[#111827] placeholder:text-[#4B5563]/50 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-colors"
         />
 
         {/* Type select */}
         <select
           value={type}
           onChange={(e) => handleTypeChange(e.target.value)}
-          className="border border-[#d4c9b8] rounded-xl px-4 py-3 font-sans text-[#1a1410] bg-white focus:outline-none focus:ring-2 focus:ring-[#AC4747]/30 focus:border-[#AC4747] transition-colors sm:w-52"
+          className="border border-[#BFDBFE] rounded-xl px-4 py-3 font-sans text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-colors sm:w-52"
         >
           <option value="">Todos</option>
           <option value="temporada">🏖️ Temporada</option>
@@ -60,7 +60,7 @@ export default function SearchBar({ onFilter }: SearchBarProps) {
         {/* Search button */}
         <button
           type="submit"
-          className="bg-[#AC4747] hover:bg-[#8a3636] text-white font-sans font-semibold px-6 py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+          className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-sans font-semibold px-6 py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
         >
           <svg
             className="w-5 h-5"

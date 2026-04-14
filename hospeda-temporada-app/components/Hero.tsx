@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-[#1a1410] overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center bg-[#111827] overflow-hidden">
       {/* Background image overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-20"
@@ -19,7 +19,7 @@ export default function Hero() {
         {/* Heading */}
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-white leading-tight">
           Reserve online,{" "}
-          <em className="text-[#AC4747] not-italic italic">sem complicação</em>
+          <em className="text-[#2563EB] not-italic italic">sem complicação</em>
         </h1>
 
         {/* Subtitle */}
@@ -33,7 +33,7 @@ export default function Hero() {
         <div className="flex flex-col sm:flex-row gap-4 mt-2 w-full sm:w-auto">
           <a
             href="#imoveis"
-            className="inline-flex items-center justify-center bg-[#AC4747] hover:bg-[#8a3636] text-white font-sans font-semibold px-8 py-4 rounded-full text-base transition-colors"
+            className="inline-flex items-center justify-center bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-sans font-semibold px-8 py-4 rounded-full text-base transition-colors"
           >
             Ver imóveis disponíveis
           </a>
