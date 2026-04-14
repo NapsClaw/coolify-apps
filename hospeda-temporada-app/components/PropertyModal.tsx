@@ -109,10 +109,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
       setPriceBreakdown(null);
       return;
     }
-    // Parse guest count from range string (e.g., "6-10" → 10)
-    const guestCount = formData.pessoas
-      ? parseInt(formData.pessoas.replace('+', '').split('-').pop() || '1')
-      : 1;
+    const guestCount = formData.pessoas ? parseInt(formData.pessoas, 10) : 1;
 
     const timer = setTimeout(async () => {
       setPriceLoading(true);
@@ -139,7 +136,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!property || !selectedStart || !selectedEnd) return;
+    if (!property || !selectedStart || !selectedEnd || !formData.pessoas) return;
 
     setSubmitting(true);
 
@@ -315,20 +312,19 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
 
           {/* Guest selector — above pricing so user sees price update */}
           <div className="mt-4">
-            <select
+            <input
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              placeholder="Nº de pessoas"
               value={formData.pessoas}
-              onChange={(e) =>
-                setFormData({ ...formData, pessoas: e.target.value })
-              }
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                setFormData({ ...formData, pessoas: value });
+              }}
               className="w-full border border-[#BFDBFE] rounded-xl px-4 py-3 font-sans text-[#111827] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB]"
-            >
-              <option value="">Nº de pessoas</option>
-              <option value="1-5">1-5</option>
-              <option value="6-10">6-10</option>
-              <option value="11-20">11-20</option>
-              <option value="21-30">21-30</option>
-              <option value="30+">30+</option>
-            </select>
+            />
           </div>
 
           {/* Dynamic price breakdown */}
@@ -436,7 +432,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
           {/* Submit */}
           <button
             type="submit"
-            disabled={!selectedStart || !selectedEnd || submitting}
+            disabled={!selectedStart || !selectedEnd || !formData.pessoas || submitting}
             className="bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#BFDBFE] text-white font-sans font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
           >
             {submitting ? (
