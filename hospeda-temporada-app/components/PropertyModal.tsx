@@ -346,7 +346,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
 
           {/* Description */}
           {property.description && (
-            <p className="text-[#4B5563] font-sans text-sm leading-relaxed">
+            <p className="text-[#4B5563] font-sans text-sm leading-relaxed whitespace-pre-line">
               {property.description}
             </p>
           )}
