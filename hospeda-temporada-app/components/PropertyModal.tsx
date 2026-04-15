@@ -421,12 +421,18 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
               <span className="font-sans font-semibold text-[#111827] text-sm">
                 {selectedStart ? formatBRDate(selectedStart) : "Selecione no calendário"}
               </span>
+              {property.checkin_time && (
+                <span className="block text-xs text-[#2563EB] font-sans mt-0.5">a partir das {property.checkin_time}</span>
+              )}
             </div>
             <div className="bg-[#F8FAFC] rounded-xl px-4 py-3">
               <span className="text-xs font-sans text-[#4B5563] block">Check-out</span>
               <span className="font-sans font-semibold text-[#111827] text-sm">
                 {selectedEnd ? formatBRDate(selectedEnd) : "Selecione no calendário"}
               </span>
+              {property.checkout_time && (
+                <span className="block text-xs text-[#2563EB] font-sans mt-0.5">até às {property.checkout_time}</span>
+              )}
             </div>
           </div>
 

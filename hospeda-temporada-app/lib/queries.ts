@@ -84,10 +84,14 @@ export async function updateProperty(id: string, data: Partial<{
   images: string[];
   sort_order: number;
   active: boolean;
+  checkin_time: string | null;
+  checkout_time: string | null;
 }>) {
   await ensureDb();
   const sql = getDb();
 
+  if (data.checkin_time !== undefined) await sql`UPDATE properties SET checkin_time = ${data.checkin_time}, updated_at = NOW() WHERE id = ${id}`;
+  if (data.checkout_time !== undefined) await sql`UPDATE properties SET checkout_time = ${data.checkout_time}, updated_at = NOW() WHERE id = ${id}`;
   if (data.name !== undefined) await sql`UPDATE properties SET name = ${data.name}, updated_at = NOW() WHERE id = ${id}`;
   if (data.location !== undefined) await sql`UPDATE properties SET location = ${data.location}, updated_at = NOW() WHERE id = ${id}`;
   if (data.type !== undefined) await sql`UPDATE properties SET type = ${data.type}, updated_at = NOW() WHERE id = ${id}`;

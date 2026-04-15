@@ -81,6 +81,8 @@ async function initDb() {
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_pricing_rules_property ON pricing_rules(property_id)`;
   await sql`ALTER TABLE pricing_rules ADD COLUMN IF NOT EXISTS min_nights INTEGER`;
+  await sql`ALTER TABLE properties ADD COLUMN IF NOT EXISTS checkin_time TEXT`;
+  await sql`ALTER TABLE properties ADD COLUMN IF NOT EXISTS checkout_time TEXT`;
 }
 
 async function ensureDb() {

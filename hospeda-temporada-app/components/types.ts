@@ -13,6 +13,8 @@ export interface Property {
   sort_order: number;
   active: boolean;
   base_price?: number | null;
+  checkin_time?: string | null;
+  checkout_time?: string | null;
 }
 
 export interface BlockedDateRange {

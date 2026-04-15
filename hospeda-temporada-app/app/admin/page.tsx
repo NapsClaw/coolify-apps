@@ -18,6 +18,8 @@ interface Property {
   images: string[] | string;
   sort_order: number;
   active: boolean;
+  checkin_time?: string | null;
+  checkout_time?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -159,7 +161,7 @@ export default function AdminPage() {
   const [propertyForm, setPropertyForm] = useState({
     id: '', name: '', location: '', type: 'temporada', badge: '', price: '',
     price_unit: '', guests: '', description: '', features: '', images: '',
-    sort_order: 0, active: true,
+    sort_order: 0, active: true, checkin_time: '', checkout_time: '',
   });
 
   const [actionLoading, setActionLoading] = useState<number | string | null>(null);
@@ -525,7 +527,7 @@ export default function AdminPage() {
     setPropertyForm({
       id: '', name: '', location: '', type: 'temporada', badge: '', price: '',
       price_unit: '', guests: '', description: '', features: '', images: '',
-      sort_order: 0, active: true,
+      sort_order: 0, active: true, checkin_time: '', checkout_time: '',
     });
     setShowPropertyForm(true);
   };
@@ -548,6 +550,8 @@ export default function AdminPage() {
       images: imgs.join('\n'),
       sort_order: p.sort_order ?? 0,
       active: p.active ?? true,
+      checkin_time: p.checkin_time || '',
+      checkout_time: p.checkout_time || '',
     });
     setShowPropertyForm(true);
   };
@@ -558,6 +562,8 @@ export default function AdminPage() {
       ...propertyForm,
       features: propertyForm.features.split('\n').map(f => f.trim()).filter(Boolean),
       images: propertyForm.images.split('\n').map(u => u.trim()).filter(Boolean),
+      checkin_time: propertyForm.checkin_time.trim() || null,
+      checkout_time: propertyForm.checkout_time.trim() || null,
     };
 
     try {
@@ -1862,6 +1868,32 @@ export default function AdminPage() {
                         type="number"
                         value={propertyForm.sort_order}
                         onChange={e => setPropertyForm(f => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                      />
+                    </div>
+
+                    {/* Check-in time */}
+                    <div>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">
+                        Horário check-in <span className="text-[#BFDBFE] font-normal">(opcional)</span>
+                      </label>
+                      <input
+                        type="time"
+                        value={propertyForm.checkin_time}
+                        onChange={e => setPropertyForm(f => ({ ...f, checkin_time: e.target.value }))}
+                        className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                      />
+                    </div>
+
+                    {/* Check-out time */}
+                    <div>
+                      <label className="block text-sm font-medium text-[#4B5563] mb-1">
+                        Horário check-out <span className="text-[#BFDBFE] font-normal">(opcional)</span>
+                      </label>
+                      <input
+                        type="time"
+                        value={propertyForm.checkout_time}
+                        onChange={e => setPropertyForm(f => ({ ...f, checkout_time: e.target.value }))}
                         className="w-full px-3 py-2.5 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                       />
                     </div>
