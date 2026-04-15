@@ -180,6 +180,7 @@ export default function AdminPage() {
     date_end: string | null;
     min_guests: number | null;
     price_per_extra_guest: number | null;
+    min_nights: number | null;
     label: string | null;
     priority: number;
     active: boolean;
@@ -360,8 +361,10 @@ export default function AdminPage() {
     const prices: Record<string, string> = {};
     const base = pricingRules.find(r => r.rule_type === 'base');
     if (base?.price_per_night) prices['base'] = String(base.price_per_night);
+    if (base?.min_nights) prices['base_min_nights'] = String(base.min_nights);
     const weekend = pricingRules.find(r => r.rule_type === 'weekend');
     if (weekend?.price_per_night) prices['weekend'] = String(weekend.price_per_night);
+    if (weekend?.min_nights) prices['weekend_min_nights'] = String(weekend.min_nights);
     const surcharge = pricingRules.find(r => r.rule_type === 'guest_surcharge');
     if (surcharge?.min_guests) prices['min_guests'] = String(surcharge.min_guests);
     if (surcharge?.price_per_extra_guest) prices['price_extra'] = String(surcharge.price_per_extra_guest);
@@ -370,10 +373,12 @@ export default function AdminPage() {
       if (r.label) prices[`seasonal_label_${r.id}`] = r.label;
       if (r.season_start_day) prices[`seasonal_start_day_${r.id}`] = String(r.season_start_day);
       if (r.season_end_day) prices[`seasonal_end_day_${r.id}`] = String(r.season_end_day);
+      if (r.min_nights) prices[`seasonal_min_nights_${r.id}`] = String(r.min_nights);
     });
     pricingRules.filter(r => r.rule_type === 'custom').forEach(r => {
       if (r.price_per_night) prices[`custom_${r.id}`] = String(r.price_per_night);
       if (r.label) prices[`custom_label_${r.id}`] = r.label;
+      if (r.min_nights) prices[`custom_min_nights_${r.id}`] = String(r.min_nights);
     });
     setLocalPrices(prices);
   }, [pricingRules]);
@@ -1321,6 +1326,27 @@ export default function AdminPage() {
                       />
                       <span className="text-sm text-[#4B5563]">/ noite</span>
                     </div>
+                    <div className="mt-3 pt-3 border-t border-[#BFDBFE]/50">
+                      <label className="block text-sm text-[#4B5563] mb-1">Mínimo global de noites</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          value={localPrices['base_min_nights'] ?? ''}
+                          onChange={e => {
+                            setLocalPrices(prev => ({ ...prev, base_min_nights: e.target.value }));
+                            const raw = e.target.value.trim();
+                            const val = raw === '' ? null : Math.max(1, parseInt(raw) || 1);
+                            const existing = pricingRules.find(r => r.rule_type === 'base');
+                            debouncedSavePricingRule('base_min_nights', { id: existing?.id, rule_type: 'base', min_nights: val });
+                          }}
+                          placeholder="sem mínimo"
+                          className="w-32 px-3 py-2 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                        />
+                        <span className="text-xs text-[#4B5563]">noites</span>
+                      </div>
+                      <p className="text-xs text-[#9CA3AF] mt-1">Aplica em qualquer reserva. Deixe vazio para sem mínimo.</p>
+                    </div>
                   </div>
 
                   {/* Weekend price */}
@@ -1364,6 +1390,27 @@ export default function AdminPage() {
                           </label>
                         );
                       })}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-[#BFDBFE]/50">
+                      <label className="block text-sm text-[#4B5563] mb-1">Mínimo de noites neste período</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          value={localPrices['weekend_min_nights'] ?? ''}
+                          onChange={e => {
+                            setLocalPrices(prev => ({ ...prev, weekend_min_nights: e.target.value }));
+                            const raw = e.target.value.trim();
+                            const val = raw === '' ? null : Math.max(1, parseInt(raw) || 1);
+                            const existing = pricingRules.find(r => r.rule_type === 'weekend');
+                            debouncedSavePricingRule('weekend_min_nights', { id: existing?.id, rule_type: 'weekend', min_nights: val, weekend_days: existing?.weekend_days || [5, 6] });
+                          }}
+                          placeholder="sem mínimo"
+                          className="w-32 px-3 py-2 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                        />
+                        <span className="text-xs text-[#4B5563]">noites</span>
+                      </div>
+                      <p className="text-xs text-[#9CA3AF] mt-1">Conta apenas noites dentro do fim de semana. Hóspede não pode diluir pegando dias fora.</p>
                     </div>
                   </div>
 
@@ -1461,6 +1508,23 @@ export default function AdminPage() {
                           }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40" />
                           <span className="text-sm text-[#4B5563]">/ noite</span>
                         </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-[#4B5563]">Mínimo</span>
+                          <input
+                            type="number"
+                            min={1}
+                            value={localPrices[`seasonal_min_nights_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`seasonal_min_nights_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(1, parseInt(raw) || 1);
+                              debouncedSavePricingRule(`seasonal_min_nights_${rule.id}`, { id: rule.id, rule_type: 'seasonal', min_nights: val });
+                            }}
+                            placeholder="sem mínimo"
+                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">noites dentro do período</span>
+                        </div>
                       </div>
                     ))}
                     {pricingRules.filter(r => r.rule_type === 'seasonal').length === 0 && (
@@ -1507,6 +1571,23 @@ export default function AdminPage() {
                             debouncedSavePricingRule(`custom_${rule.id}`, { id: rule.id, rule_type: 'custom', price_per_night: parseInt(e.target.value) || 0 });
                           }} placeholder="0" className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40" />
                           <span className="text-sm text-[#4B5563]">/ noite</span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-[#4B5563]">Mínimo</span>
+                          <input
+                            type="number"
+                            min={1}
+                            value={localPrices[`custom_min_nights_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`custom_min_nights_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(1, parseInt(raw) || 1);
+                              debouncedSavePricingRule(`custom_min_nights_${rule.id}`, { id: rule.id, rule_type: 'custom', min_nights: val });
+                            }}
+                            placeholder="sem mínimo"
+                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">noites dentro do período</span>
                         </div>
                       </div>
                     ))}

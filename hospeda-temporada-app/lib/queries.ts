@@ -266,6 +266,7 @@ export async function createPricingRule(data: {
   date_end?: string | null;
   min_guests?: number | null;
   price_per_extra_guest?: number | null;
+  min_nights?: number | null;
   label?: string | null;
   priority?: number;
 }) {
@@ -278,6 +279,7 @@ export async function createPricingRule(data: {
       season_end_month, season_end_day,
       date_start, date_end,
       min_guests, price_per_extra_guest,
+      min_nights,
       label, priority
     ) VALUES (
       ${data.property_id}, ${data.rule_type}, ${data.price_per_night ?? null},
@@ -285,6 +287,7 @@ export async function createPricingRule(data: {
       ${data.season_end_month ?? null}, ${data.season_end_day ?? null},
       ${data.date_start ?? null}, ${data.date_end ?? null},
       ${data.min_guests ?? null}, ${data.price_per_extra_guest ?? null},
+      ${data.min_nights ?? null},
       ${data.label ?? null}, ${data.priority ?? 0}
     )
     RETURNING *
@@ -303,6 +306,7 @@ export async function updatePricingRule(id: number, data: Partial<{
   date_end: string | null;
   min_guests: number | null;
   price_per_extra_guest: number | null;
+  min_nights: number | null;
   label: string | null;
   priority: number;
   active: boolean;
@@ -321,6 +325,7 @@ export async function updatePricingRule(id: number, data: Partial<{
   if (data.date_end !== undefined) await sql`UPDATE pricing_rules SET date_end = ${data.date_end}, updated_at = NOW() WHERE id = ${id}`;
   if (data.min_guests !== undefined) await sql`UPDATE pricing_rules SET min_guests = ${data.min_guests}, updated_at = NOW() WHERE id = ${id}`;
   if (data.price_per_extra_guest !== undefined) await sql`UPDATE pricing_rules SET price_per_extra_guest = ${data.price_per_extra_guest}, updated_at = NOW() WHERE id = ${id}`;
+  if (data.min_nights !== undefined) await sql`UPDATE pricing_rules SET min_nights = ${data.min_nights}, updated_at = NOW() WHERE id = ${id}`;
   if (data.label !== undefined) await sql`UPDATE pricing_rules SET label = ${data.label}, updated_at = NOW() WHERE id = ${id}`;
   if (data.priority !== undefined) await sql`UPDATE pricing_rules SET priority = ${data.priority}, updated_at = NOW() WHERE id = ${id}`;
   if (data.active !== undefined) await sql`UPDATE pricing_rules SET active = ${data.active}, updated_at = NOW() WHERE id = ${id}`;

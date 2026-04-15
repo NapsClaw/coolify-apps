@@ -1,4 +1,4 @@
-import { PricingRule, PriceBreakdown } from '@/components/types';
+import { PricingRule, PriceBreakdown, MinNightsViolation } from '@/components/types';
 
 function isDateInSeason(
   dateStr: string,
@@ -87,6 +87,75 @@ export function getPriceForDate(dateStr: string, rules: PricingRule[]): { price:
   return { price: baseRule.price_per_night, label: 'Diária base' };
 }
 
+function computeMinNightsViolations(
+  rules: PricingRule[],
+  nights: string[]
+): MinNightsViolation[] {
+  const violations: MinNightsViolation[] = [];
+  if (nights.length === 0) return violations;
+
+  const baseRule = rules.find(r => r.rule_type === 'base');
+  if (baseRule?.min_nights && nights.length < baseRule.min_nights) {
+    violations.push({
+      scope: 'global',
+      required: baseRule.min_nights,
+      nights_in_scope: nights.length,
+      rule_label: 'Mínimo geral',
+    });
+  }
+
+  const countIn = (predicate: (d: string) => boolean) =>
+    nights.reduce((n, d) => n + (predicate(d) ? 1 : 0), 0);
+
+  for (const rule of rules) {
+    if (!rule.active || !rule.min_nights) continue;
+
+    if (rule.rule_type === 'custom' && rule.date_start && rule.date_end) {
+      const start = rule.date_start;
+      const end = rule.date_end;
+      const inside = countIn(d => isDateInRange(d, start, end));
+      if (inside > 0 && inside < rule.min_nights) {
+        violations.push({
+          scope: 'custom',
+          required: rule.min_nights,
+          nights_in_scope: inside,
+          rule_label: rule.label || 'Período especial',
+        });
+      }
+    } else if (rule.rule_type === 'seasonal' && rule.season_start_month != null && rule.season_end_month != null) {
+      const sm = rule.season_start_month;
+      const sd = rule.season_start_day || 1;
+      const em = rule.season_end_month;
+      const ed = rule.season_end_day || 31;
+      const inside = countIn(d => isDateInSeason(d, sm, sd, em, ed));
+      if (inside > 0 && inside < rule.min_nights) {
+        violations.push({
+          scope: 'seasonal',
+          required: rule.min_nights,
+          nights_in_scope: inside,
+          rule_label: rule.label || 'Temporada',
+        });
+      }
+    } else if (rule.rule_type === 'weekend') {
+      const weekendDays = rule.weekend_days || [5, 6];
+      const inside = countIn(d => {
+        const dow = new Date(d + 'T12:00:00').getDay();
+        return weekendDays.includes(dow);
+      });
+      if (inside > 0 && inside < rule.min_nights) {
+        violations.push({
+          scope: 'weekend',
+          required: rule.min_nights,
+          nights_in_scope: inside,
+          rule_label: rule.label || 'Fim de semana',
+        });
+      }
+    }
+  }
+
+  return violations;
+}
+
 export function calculateStayPrice(
   rules: PricingRule[],
   dateStart: string,
@@ -125,6 +194,7 @@ export function calculateStayPrice(
   }
 
   const total = subtotal + (guestSurcharge?.total || 0);
+  const min_nights_violations = computeMinNightsViolations(rules, nights);
 
   return {
     has_dynamic_pricing: true,
@@ -133,5 +203,6 @@ export function calculateStayPrice(
     subtotal,
     guest_surcharge: guestSurcharge,
     total,
+    min_nights_violations,
   };
 }

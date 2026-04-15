@@ -38,9 +38,17 @@ export interface PricingRule {
   date_end: string | null;
   min_guests: number | null;
   price_per_extra_guest: number | null;
+  min_nights: number | null;
   label: string | null;
   priority: number;
   active: boolean;
+}
+
+export interface MinNightsViolation {
+  scope: 'global' | 'custom' | 'seasonal' | 'weekend';
+  required: number;
+  nights_in_scope: number;
+  rule_label: string;
 }
 
 export interface PriceBreakdown {
@@ -50,4 +58,5 @@ export interface PriceBreakdown {
   subtotal?: number;
   guest_surcharge?: { extra_guests: number; per_night: number; total: number } | null;
   total?: number;
+  min_nights_violations?: MinNightsViolation[];
 }

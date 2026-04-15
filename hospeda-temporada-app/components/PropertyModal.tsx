@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Property, BlockedDateRange } from "@/components/types";
+import { Property, BlockedDateRange, MinNightsViolation } from "@/components/types";
 import Calendar from "@/components/Calendar";
 
 interface PropertyModalProps {
@@ -11,6 +11,17 @@ interface PropertyModalProps {
 
 function toDateOnly(d: string): string {
   return d.slice(0, 10);
+}
+
+function formatBRDate(dateStr: string | null): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr + "T12:00:00");
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("pt-BR", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  });
 }
 
 function eachDayInRange(start: string | null, end: string | null): string[] {
@@ -51,6 +62,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
     subtotal?: number;
     guest_surcharge?: { extra_guests: number; per_night: number; total: number } | null;
     total?: number;
+    min_nights_violations?: MinNightsViolation[];
   } | null>(null);
   const [priceLoading, setPriceLoading] = useState(false);
 
@@ -186,6 +198,9 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
     setShowSuccess(true);
     setSubmitting(false);
   }
+
+  const violations = priceBreakdown?.min_nights_violations || [];
+  const hasViolations = violations.length > 0;
 
   if (!property) return null;
 
@@ -338,8 +353,33 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
               <div className="h-6 bg-[#BFDBFE]/40 rounded w-1/3" />
             </div>
           )}
-          {!priceLoading && priceBreakdown?.has_dynamic_pricing && priceBreakdown.total != null && (
+          {!priceLoading && hasViolations && selectedStart && selectedEnd && (
+            <div className="bg-red-50 border border-red-300 rounded-xl p-4 mt-4 space-y-2">
+              <div className="font-sans font-semibold text-red-700 text-sm">
+                Reserva não permitida
+              </div>
+              <div className="text-xs text-red-700/80">
+                Check-in: <strong>{formatBRDate(selectedStart)}</strong> · Check-out: <strong>{formatBRDate(selectedEnd)}</strong> ({priceBreakdown?.nights} {priceBreakdown?.nights === 1 ? 'noite' : 'noites'})
+              </div>
+              <ul className="text-xs text-red-700 space-y-1 list-disc pl-4">
+                {violations.map((v, i) => (
+                  <li key={i}>
+                    {v.scope === 'global' ? (
+                      <><strong>Mínimo geral</strong> exige {v.required} {v.required === 1 ? 'noite' : 'noites'} — você selecionou {v.nights_in_scope}.</>
+                    ) : (
+                      <><strong>{v.rule_label}</strong> exige {v.required} {v.required === 1 ? 'noite' : 'noites'} dentro do período — você selecionou {v.nights_in_scope}.</>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs text-red-700/70 pt-1">Ajuste o check-out para atender o mínimo.</p>
+            </div>
+          )}
+          {!priceLoading && !hasViolations && priceBreakdown?.has_dynamic_pricing && priceBreakdown.total != null && (
             <div className="bg-[#F8FAFC] rounded-xl p-4 mt-4 space-y-2">
+              <div className="text-xs text-[#4B5563]">
+                Check-in: <strong className="text-[#111827]">{formatBRDate(selectedStart)}</strong> · Check-out: <strong className="text-[#111827]">{formatBRDate(selectedEnd)}</strong>
+              </div>
               <div className="flex justify-between items-center">
                 <span className="font-sans text-sm text-[#4B5563]">
                   {priceBreakdown.nights} {priceBreakdown.nights === 1 ? 'noite' : 'noites'}
@@ -379,13 +419,13 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
             <div className="bg-[#F8FAFC] rounded-xl px-4 py-3">
               <span className="text-xs font-sans text-[#4B5563] block">Check-in</span>
               <span className="font-sans font-semibold text-[#111827] text-sm">
-                {selectedStart || "Selecione no calendário"}
+                {selectedStart ? formatBRDate(selectedStart) : "Selecione no calendário"}
               </span>
             </div>
             <div className="bg-[#F8FAFC] rounded-xl px-4 py-3">
               <span className="text-xs font-sans text-[#4B5563] block">Check-out</span>
               <span className="font-sans font-semibold text-[#111827] text-sm">
-                {selectedEnd || "Selecione no calendário"}
+                {selectedEnd ? formatBRDate(selectedEnd) : "Selecione no calendário"}
               </span>
             </div>
           </div>
@@ -436,8 +476,8 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
           {/* Submit */}
           <button
             type="submit"
-            disabled={!selectedStart || !selectedEnd || !formData.pessoas || submitting}
-            className="bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#BFDBFE] text-white font-sans font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+            disabled={!selectedStart || !selectedEnd || !formData.pessoas || submitting || hasViolations}
+            className="bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#BFDBFE] disabled:cursor-not-allowed text-white font-sans font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
           >
             {submitting ? (
               "Enviando..."

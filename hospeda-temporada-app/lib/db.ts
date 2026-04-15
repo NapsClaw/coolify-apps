@@ -71,6 +71,7 @@ async function initDb() {
       date_end DATE,
       min_guests INTEGER,
       price_per_extra_guest INTEGER,
+      min_nights INTEGER,
       label TEXT,
       priority INTEGER DEFAULT 0,
       active BOOLEAN DEFAULT true,
@@ -79,6 +80,7 @@ async function initDb() {
     )
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_pricing_rules_property ON pricing_rules(property_id)`;
+  await sql`ALTER TABLE pricing_rules ADD COLUMN IF NOT EXISTS min_nights INTEGER`;
 }
 
 async function ensureDb() {
