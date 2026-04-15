@@ -41,6 +41,7 @@ function eachDayInRange(start: string | null, end: string | null): string[] {
 
 export default function PropertyModal({ property, onClose }: PropertyModalProps) {
   const [mainImage, setMainImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
   const [pendingDates, setPendingDates] = useState<Set<string>>(new Set());
   const [selectedStart, setSelectedStart] = useState<string | null>(null);
@@ -70,6 +71,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
   useEffect(() => {
     if (!property) return;
     setMainImage(0);
+    setLightboxOpen(false);
     setSelectedStart(null);
     setSelectedEnd(null);
     setShowSuccess(false);
@@ -98,6 +100,19 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
         setPendingDates(new Set());
       });
   }, [property]);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightboxOpen || !property) return;
+    const imgCount = property.images?.length || 1;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+      else if (e.key === "ArrowLeft") setMainImage((i) => (i - 1 + imgCount) % imgCount);
+      else if (e.key === "ArrowRight") setMainImage((i) => (i + 1) % imgCount);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen, property]);
 
   const handleSelectDay = useCallback(
     (dateStr: string) => {
@@ -240,12 +255,46 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
         )}
 
         {/* Gallery */}
-        <div className="relative">
+        <div className="relative group">
           <img
             src={images[mainImage]}
             alt={property.name}
-            className="w-full h-[280px] sm:h-[320px] object-cover"
+            onClick={() => setLightboxOpen(true)}
+            className="w-full h-[280px] sm:h-[320px] object-cover cursor-zoom-in"
           />
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMainImage((i) => (i - 1 + images.length) % images.length);
+                }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors"
+                aria-label="Foto anterior"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMainImage((i) => (i + 1) % images.length);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors"
+                aria-label="Próxima foto"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs font-sans px-2.5 py-1 rounded-full">
+                {mainImage + 1} / {images.length}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Thumbnails */}
@@ -512,6 +561,72 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
           </a>
         </div>
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            setLightboxOpen(false);
+          }}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxOpen(false);
+            }}
+            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            aria-label="Fechar"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <img
+            src={images[mainImage]}
+            alt={property.name}
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-[94vw] max-h-[88vh] object-contain select-none"
+          />
+
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMainImage((i) => (i - 1 + images.length) % images.length);
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                aria-label="Foto anterior"
+              >
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMainImage((i) => (i + 1) % images.length);
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                aria-label="Próxima foto"
+              >
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/10 text-white text-sm font-sans px-3 py-1.5 rounded-full">
+                {mainImage + 1} / {images.length}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
