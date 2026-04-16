@@ -1986,8 +1986,28 @@ export default function AdminPage() {
                       {propertyForm.images.trim() && (
                         <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-3">
                           {propertyForm.images.split('\n').map(u => u.trim()).filter(Boolean).map((url, i) => (
-                            <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-[#BFDBFE]">
+                            <div key={i} className={`relative group aspect-square rounded-lg overflow-hidden border-2 ${i === 0 ? 'border-[#2563EB] ring-2 ring-[#2563EB]/30' : 'border-[#BFDBFE]'}`}>
                               <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                              {i === 0 && (
+                                <span className="absolute top-1 left-1 bg-[#2563EB] text-white text-[10px] font-sans font-semibold px-1.5 py-0.5 rounded">
+                                  CAPA
+                                </span>
+                              )}
+                              {i !== 0 && (
+                                <button
+                                  type="button"
+                                  title="Definir como foto de capa"
+                                  onClick={() => {
+                                    const imgs = propertyForm.images.split('\n').map(u => u.trim()).filter(Boolean);
+                                    const [moved] = imgs.splice(i, 1);
+                                    imgs.unshift(moved);
+                                    setPropertyForm(f => ({ ...f, images: imgs.join('\n') }));
+                                  }}
+                                  className="absolute bottom-1 left-1 w-6 h-6 bg-[#2563EB]/80 hover:bg-[#2563EB] text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  ★
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 onClick={() => {
