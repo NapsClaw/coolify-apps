@@ -346,43 +346,69 @@ export default function AdminPage() {
   }, [authenticated, activeTab, pricingProperty, loadPricingRules]);
 
   const savePricingRule = useCallback(async (data: Record<string, unknown>) => {
-    setActionLoading('pricing');
     try {
       if (data.id) {
-        await fetchApi('/api/pricing', { method: 'PUT', body: JSON.stringify(data) });
+        // PUT: optimistic local update first, then reconcile with server response
+        setPricingRules(prev => prev.map(r =>
+          r.id === data.id ? { ...r, ...(data as Partial<PricingRuleLocal>) } : r
+        ));
+        const res = await fetchApi('/api/pricing', { method: 'PUT', body: JSON.stringify(data) });
+        if (res.ok) {
+          const saved = await res.json();
+          setPricingRules(prev => prev.map(r => r.id === saved.id ? saved : r));
+        }
       } else {
-        await fetchApi('/api/pricing', { method: 'POST', body: JSON.stringify({ ...data, property_id: pricingProperty }) });
+        // POST: wait for server to get the new id, then append
+        const res = await fetchApi('/api/pricing', {
+          method: 'POST',
+          body: JSON.stringify({ ...data, property_id: pricingProperty }),
+        });
+        if (res.ok) {
+          const created = await res.json();
+          setPricingRules(prev => [...prev, created]);
+        }
       }
-      await loadPricingRules(pricingProperty);
     } catch (err) { console.error(err); }
-    finally { setActionLoading(null); }
-  }, [fetchApi, pricingProperty, loadPricingRules]);
+  }, [fetchApi, pricingProperty]);
 
-  // Sync local prices when rules load from API
+  // Reset local prices only when switching properties — not on every rule change.
+  // This prevents overwriting fields the user is actively typing into.
   useEffect(() => {
-    const prices: Record<string, string> = {};
+    setLocalPrices({});
+  }, [pricingProperty]);
+
+  // Seed local prices from server rules for keys not yet touched by the user.
+  useEffect(() => {
+    const seed: Record<string, string> = {};
     const base = pricingRules.find(r => r.rule_type === 'base');
-    if (base?.price_per_night) prices['base'] = String(base.price_per_night);
-    if (base?.min_nights) prices['base_min_nights'] = String(base.min_nights);
+    if (base?.price_per_night != null) seed['base'] = String(base.price_per_night);
+    if (base?.min_nights != null) seed['base_min_nights'] = String(base.min_nights);
     const weekend = pricingRules.find(r => r.rule_type === 'weekend');
-    if (weekend?.price_per_night) prices['weekend'] = String(weekend.price_per_night);
-    if (weekend?.min_nights) prices['weekend_min_nights'] = String(weekend.min_nights);
+    if (weekend?.price_per_night != null) seed['weekend'] = String(weekend.price_per_night);
+    if (weekend?.min_nights != null) seed['weekend_min_nights'] = String(weekend.min_nights);
     const surcharge = pricingRules.find(r => r.rule_type === 'guest_surcharge');
-    if (surcharge?.min_guests) prices['min_guests'] = String(surcharge.min_guests);
-    if (surcharge?.price_per_extra_guest) prices['price_extra'] = String(surcharge.price_per_extra_guest);
+    if (surcharge?.min_guests != null) seed['min_guests'] = String(surcharge.min_guests);
+    if (surcharge?.price_per_extra_guest != null) seed['price_extra'] = String(surcharge.price_per_extra_guest);
     pricingRules.filter(r => r.rule_type === 'seasonal').forEach(r => {
-      if (r.price_per_night) prices[`seasonal_${r.id}`] = String(r.price_per_night);
-      if (r.label) prices[`seasonal_label_${r.id}`] = r.label;
-      if (r.season_start_day) prices[`seasonal_start_day_${r.id}`] = String(r.season_start_day);
-      if (r.season_end_day) prices[`seasonal_end_day_${r.id}`] = String(r.season_end_day);
-      if (r.min_nights) prices[`seasonal_min_nights_${r.id}`] = String(r.min_nights);
+      if (r.price_per_night != null) seed[`seasonal_${r.id}`] = String(r.price_per_night);
+      if (r.label != null) seed[`seasonal_label_${r.id}`] = r.label;
+      if (r.season_start_day != null) seed[`seasonal_start_day_${r.id}`] = String(r.season_start_day);
+      if (r.season_end_day != null) seed[`seasonal_end_day_${r.id}`] = String(r.season_end_day);
+      if (r.min_nights != null) seed[`seasonal_min_nights_${r.id}`] = String(r.min_nights);
     });
     pricingRules.filter(r => r.rule_type === 'custom').forEach(r => {
-      if (r.price_per_night) prices[`custom_${r.id}`] = String(r.price_per_night);
-      if (r.label) prices[`custom_label_${r.id}`] = r.label;
-      if (r.min_nights) prices[`custom_min_nights_${r.id}`] = String(r.min_nights);
+      if (r.price_per_night != null) seed[`custom_${r.id}`] = String(r.price_per_night);
+      if (r.label != null) seed[`custom_label_${r.id}`] = r.label;
+      if (r.min_nights != null) seed[`custom_min_nights_${r.id}`] = String(r.min_nights);
     });
-    setLocalPrices(prices);
+    setLocalPrices(prev => {
+      const next = { ...prev };
+      let changed = false;
+      for (const [k, v] of Object.entries(seed)) {
+        if (next[k] === undefined) { next[k] = v; changed = true; }
+      }
+      return changed ? next : prev;
+    });
   }, [pricingRules]);
 
   const debouncedSavePricingRule = useCallback((key: string, data: Record<string, unknown>) => {
@@ -393,12 +419,15 @@ export default function AdminPage() {
   }, [savePricingRule]);
 
   const deletePricingRuleHandler = async (id: number) => {
-    setActionLoading('pricing');
+    const snapshot = pricingRules;
+    setPricingRules(prev => prev.filter(r => r.id !== id));
     try {
-      await fetchApi('/api/pricing', { method: 'DELETE', body: JSON.stringify({ id }) });
-      await loadPricingRules(pricingProperty);
-    } catch (err) { console.error(err); }
-    finally { setActionLoading(null); }
+      const res = await fetchApi('/api/pricing', { method: 'DELETE', body: JSON.stringify({ id }) });
+      if (!res.ok) setPricingRules(snapshot);
+    } catch (err) {
+      console.error(err);
+      setPricingRules(snapshot);
+    }
   };
 
   // Pricing calendar helper
@@ -568,17 +597,25 @@ export default function AdminPage() {
 
     try {
       if (editingProperty) {
-        await fetchApi('/api/properties', {
+        const res = await fetchApi('/api/properties', {
           method: 'PUT',
           body: JSON.stringify(payload),
         });
+        if (res.ok) {
+          const updated = await res.json();
+          setProperties(prev => prev.map(p =>
+            p.id === (updated?.id ?? editingProperty.id)
+              ? { ...p, ...(updated?.id ? updated : payload) }
+              : p
+          ));
+        }
       } else {
         await fetchApi('/api/properties', {
           method: 'POST',
           body: JSON.stringify(payload),
         });
+        await loadProperties();
       }
-      await loadProperties();
       setShowPropertyForm(false);
       setEditingProperty(null);
     } catch (err) { console.error(err); }
@@ -589,12 +626,17 @@ export default function AdminPage() {
     if (!editingProperty) return;
     if (!confirm(`Desativar "${editingProperty.name}"?`)) return;
     setActionLoading('property-delete');
+    const deletedId = editingProperty.id;
     try {
-      await fetchApi('/api/properties', {
+      const res = await fetchApi('/api/properties', {
         method: 'DELETE',
-        body: JSON.stringify({ id: editingProperty.id }),
+        body: JSON.stringify({ id: deletedId }),
       });
-      await loadProperties();
+      if (res.ok) {
+        setProperties(prev => prev.map(p =>
+          p.id === deletedId ? { ...p, active: false } : p
+        ));
+      }
       setShowPropertyForm(false);
       setEditingProperty(null);
     } catch (err) { console.error(err); }
