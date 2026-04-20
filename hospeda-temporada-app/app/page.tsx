@@ -19,9 +19,14 @@ export default async function Home() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-[200] bg-[rgba(248,250,252,0.97)] backdrop-blur-[8px] border-b border-[rgba(37,99,235,0.12)] px-5 py-3.5 flex items-center justify-between">
-        <a href="#" className="font-serif text-xl font-bold text-[#111827] no-underline">
-          Hospeda<span className="text-[#2563EB]">Temporada</span>
+      <nav className="fixed top-0 left-0 right-0 z-[200] bg-[rgba(248,250,252,0.97)] backdrop-blur-[8px] border-b border-[rgba(37,99,235,0.12)] px-5 py-2 flex items-center justify-between">
+        <a href="#" className="flex items-center no-underline" aria-label="Hospeda Temporada">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="Hospeda Temporada"
+            className="h-14 sm:h-16 w-auto object-contain"
+          />
         </a>
         <a
           href="#imoveis"

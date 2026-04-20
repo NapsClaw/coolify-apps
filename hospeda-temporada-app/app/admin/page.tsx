@@ -730,10 +730,13 @@ export default function AdminPage() {
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
           <div className="text-center mb-8">
-            <h1 className="font-serif text-3xl font-bold text-[#2563EB] mb-1">
-              HospedaTemporada
-            </h1>
-            <p className="text-[#4B5563] text-sm">Painel Administrativo</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Hospeda Temporada"
+              className="h-24 w-auto mx-auto object-contain"
+            />
+            <p className="text-[#4B5563] text-sm mt-1">Painel Administrativo</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -864,9 +867,12 @@ export default function AdminPage() {
       <header className="bg-white border-b border-[#BFDBFE] sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#2563EB]">
-              HospedaTemporada
-            </h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Hospeda Temporada"
+              className="h-12 sm:h-14 w-auto object-contain"
+            />
             <span className="hidden sm:inline text-xs bg-[#2563EB]/10 text-[#2563EB] px-2 py-0.5 rounded-full font-medium">
               Admin
             </span>
