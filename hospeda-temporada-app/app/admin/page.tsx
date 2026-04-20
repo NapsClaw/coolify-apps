@@ -132,7 +132,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'reservas' | 'calendario' | 'imoveis' | 'precos'>('reservas');
+  const [activeTab, setActiveTab] = useState<'reservas' | 'calendario' | 'imoveis' | 'precos' | 'cadastros'>('reservas');
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -166,6 +166,26 @@ export default function AdminPage() {
 
   const [actionLoading, setActionLoading] = useState<number | string | null>(null);
   const [uploadingImages, setUploadingImages] = useState(false);
+
+  // Cadastros tab
+  interface Submission {
+    id: number;
+    name: string;
+    phone: string;
+    email: string | null;
+    address: string;
+    intent: string;
+    description: string | null;
+    images: string[] | string;
+    details: Record<string, unknown> | string;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+    updated_at: string;
+  }
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissionFilter, setSubmissionFilter] = useState<string>('pending');
+  const [expandedSubmission, setExpandedSubmission] = useState<number | null>(null);
 
   // Toast
   const [toast, setToast] = useState<string | null>(null);
@@ -336,6 +356,54 @@ export default function AdminPage() {
       loadCalendarReservations(calendarProperty);
     }
   }, [authenticated, activeTab, calendarProperty, loadCalendarReservations]);
+
+  const loadSubmissions = useCallback(async (status?: string) => {
+    try {
+      const q = status && status !== 'all' ? `?status=${status}` : '';
+      const res = await fetchApi(`/api/submissions${q}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSubmissions(Array.isArray(data) ? data : []);
+      }
+    } catch (err) { console.error('Failed to load submissions:', err); }
+  }, [fetchApi]);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    if (activeTab === 'cadastros') loadSubmissions(submissionFilter);
+  }, [authenticated, activeTab, submissionFilter, loadSubmissions]);
+
+  const updateSubmission = useCallback(async (id: number, status: string) => {
+    setActionLoading(`sub-${id}`);
+    try {
+      const res = await fetchApi('/api/submissions', {
+        method: 'PATCH',
+        body: JSON.stringify({ id, status }),
+      });
+      if (res.ok) {
+        setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status } : s)
+          .filter(s => submissionFilter === 'all' || s.status === submissionFilter));
+        showToast(status === 'approved' ? 'Aprovado' : status === 'rejected' ? 'Rejeitado' : 'Atualizado');
+      }
+    } catch (err) { console.error(err); }
+    finally { setActionLoading(null); }
+  }, [fetchApi, submissionFilter, showToast]);
+
+  const deleteSubmission = useCallback(async (id: number) => {
+    if (!confirm('Excluir este cadastro? Essa ação é permanente.')) return;
+    setActionLoading(`sub-${id}`);
+    try {
+      const res = await fetchApi('/api/submissions', {
+        method: 'DELETE',
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        setSubmissions(prev => prev.filter(s => s.id !== id));
+        showToast('Removido');
+      }
+    } catch (err) { console.error(err); }
+    finally { setActionLoading(null); }
+  }, [fetchApi, showToast]);
 
   const loadPricingRules = useCallback(async (propId: string) => {
     if (!propId) { setPricingRules([]); return; }
@@ -896,6 +964,7 @@ export default function AdminPage() {
               { key: 'calendario' as const, label: 'Calendário', icon: '📅' },
               { key: 'precos' as const, label: 'Preços', icon: '💰' },
               { key: 'imoveis' as const, label: 'Imóveis', icon: '🏠' },
+              { key: 'cadastros' as const, label: 'Cadastros', icon: '📨' },
             ]).map(tab => (
               <button
                 key={tab.key}
@@ -911,6 +980,11 @@ export default function AdminPage() {
                 {tab.key === 'reservas' && pendingReservations.length > 0 && (
                   <span className="ml-1.5 bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                     {pendingReservations.length}
+                  </span>
+                )}
+                {tab.key === 'cadastros' && submissions.filter(s => s.status === 'pending').length > 0 && (
+                  <span className="ml-1.5 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {submissions.filter(s => s.status === 'pending').length}
                   </span>
                 )}
               </button>
@@ -2144,6 +2218,180 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* CADASTROS TAB */}
+        {!loading && activeTab === 'cadastros' && (
+          <div className="max-w-5xl mx-auto space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              {(['pending', 'approved', 'rejected', 'all'] as const).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setSubmissionFilter(f)}
+                  className={`px-3 py-1.5 text-sm rounded-lg border transition ${
+                    submissionFilter === f
+                      ? 'border-[#2563EB] bg-[#EFF6FF] text-[#1E40AF] font-semibold'
+                      : 'border-[#D1D5DB] text-[#4B5563]'
+                  }`}
+                >
+                  {f === 'pending' ? 'Pendentes' : f === 'approved' ? 'Aprovados' : f === 'rejected' ? 'Rejeitados' : 'Todos'}
+                </button>
+              ))}
+              <button
+                onClick={() => loadSubmissions(submissionFilter)}
+                className="ml-auto text-sm text-[#2563EB] font-semibold"
+              >
+                ↻ Atualizar
+              </button>
+            </div>
+
+            {submissions.length === 0 && (
+              <div className="bg-white rounded-xl border border-[#E5E7EB] p-10 text-center text-[#6B7280]">
+                Nenhum cadastro {submissionFilter === 'pending' ? 'pendente' : submissionFilter === 'approved' ? 'aprovado' : submissionFilter === 'rejected' ? 'rejeitado' : ''}.
+              </div>
+            )}
+
+            {submissions.map(s => {
+              const images = typeof s.images === 'string' ? (() => { try { return JSON.parse(s.images); } catch { return []; } })() : (s.images || []);
+              const details = typeof s.details === 'string' ? (() => { try { return JSON.parse(s.details); } catch { return {}; } })() : (s.details || {});
+              const d = details as Record<string, unknown>;
+              const cap = (d.capacity || {}) as Record<string, string>;
+              const pricing = (d.pricing || {}) as Record<string, string>;
+              const rules = (d.rules || {}) as Record<string, string>;
+              const amenities = (d.amenities || []) as string[];
+              const busy = actionLoading === `sub-${s.id}`;
+              const expanded = expandedSubmission === s.id;
+              const statusColor = s.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : s.status === 'rejected' ? 'bg-red-50 text-red-700 border-red-200'
+                : 'bg-amber-50 text-amber-700 border-amber-200';
+              const statusLabel = s.status === 'approved' ? 'Aprovado' : s.status === 'rejected' ? 'Rejeitado' : 'Pendente';
+              return (
+                <div key={s.id} className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <h3 className="text-lg font-bold text-[#111827]">
+                            {(d.propertyName as string) || s.name}
+                          </h3>
+                          <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColor}`}>{statusLabel}</span>
+                          {d.propertyType ? <span className="text-xs text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded">{String(d.propertyType)}</span> : null}
+                          <span className="text-xs text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded">{s.intent}</span>
+                        </div>
+                        <p className="text-sm text-[#4B5563]">
+                          <strong>{s.name}</strong> · {s.phone}{s.email ? ` · ${s.email}` : ''}
+                        </p>
+                        <p className="text-sm text-[#6B7280] mt-0.5">{s.address}</p>
+                        <p className="text-xs text-[#9CA3AF] mt-1">Enviado {relativeTime(s.created_at)}</p>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        {s.status !== 'approved' && (
+                          <button disabled={busy} onClick={() => updateSubmission(s.id, 'approved')}
+                            className="px-3 py-1.5 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50">
+                            Aprovar
+                          </button>
+                        )}
+                        {s.status !== 'rejected' && (
+                          <button disabled={busy} onClick={() => updateSubmission(s.id, 'rejected')}
+                            className="px-3 py-1.5 text-sm rounded-lg border border-[#D1D5DB] text-[#4B5563] hover:bg-gray-50 disabled:opacity-50">
+                            Rejeitar
+                          </button>
+                        )}
+                        <button disabled={busy} onClick={() => deleteSubmission(s.id)}
+                          className="px-3 py-1.5 text-sm rounded-lg bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50">
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+
+                    {images.length > 0 && (
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-4">
+                        {(images as string[]).slice(0, expanded ? images.length : 6).map((src, i) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <a key={i} href={src} target="_blank" rel="noreferrer" className="block aspect-square rounded-lg overflow-hidden border border-[#E5E7EB]">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={src} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => setExpandedSubmission(expanded ? null : s.id)}
+                      className="mt-3 text-sm text-[#2563EB] font-semibold"
+                    >
+                      {expanded ? '− Ocultar detalhes' : '+ Ver detalhes'}
+                    </button>
+
+                    {expanded && (
+                      <div className="mt-4 pt-4 border-t border-[#E5E7EB] space-y-3 text-sm">
+                        {d.mapsLink ? (
+                          <div><strong>Google Maps:</strong> <a href={String(d.mapsLink)} target="_blank" rel="noreferrer" className="text-[#2563EB] underline break-all">{String(d.mapsLink)}</a></div>
+                        ) : null}
+                        {(cap.guests || cap.bedrooms || cap.beds || cap.bathrooms || cap.area) && (
+                          <div className="flex flex-wrap gap-4 text-[#4B5563]">
+                            {cap.guests && <span>👥 {cap.guests} hóspedes</span>}
+                            {cap.bedrooms && <span>🛏️ {cap.bedrooms} quartos</span>}
+                            {cap.beds && <span>🛌 {cap.beds} camas</span>}
+                            {cap.bathrooms && <span>🚿 {cap.bathrooms} banheiros</span>}
+                            {cap.area && <span>📐 {cap.area} m²</span>}
+                          </div>
+                        )}
+                        {amenities.length > 0 && (
+                          <div>
+                            <strong className="block mb-1">Comodidades:</strong>
+                            <div className="flex flex-wrap gap-1.5">
+                              {amenities.map(a => <span key={a} className="text-xs bg-[#EFF6FF] text-[#1E40AF] px-2 py-0.5 rounded">{a}</span>)}
+                            </div>
+                          </div>
+                        )}
+                        {(pricing.priceLow || pricing.priceHigh || pricing.priceWeekend) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            {pricing.priceLow && <div className="bg-[#F9FAFB] rounded-lg p-2"><div className="text-xs text-[#6B7280]">Baixa temp.</div><div className="font-semibold">{pricing.priceLow}</div></div>}
+                            {pricing.priceHigh && <div className="bg-[#F9FAFB] rounded-lg p-2"><div className="text-xs text-[#6B7280]">Alta temp.</div><div className="font-semibold">{pricing.priceHigh}</div></div>}
+                            {pricing.priceWeekend && <div className="bg-[#F9FAFB] rounded-lg p-2"><div className="text-xs text-[#6B7280]">Fim de semana</div><div className="font-semibold">{pricing.priceWeekend}</div></div>}
+                          </div>
+                        )}
+                        {(pricing.minNights || pricing.checkin || pricing.checkout) && (
+                          <div className="flex flex-wrap gap-4 text-[#4B5563]">
+                            {pricing.minNights && <span>Estadia mínima: {pricing.minNights}</span>}
+                            {pricing.checkin && <span>Check-in: {pricing.checkin}</span>}
+                            {pricing.checkout && <span>Check-out: {pricing.checkout}</span>}
+                          </div>
+                        )}
+                        {(rules.allowEvents || rules.allowChildren || rules.allowSmoking || rules.allowPets) && (
+                          <div className="flex flex-wrap gap-4 text-[#4B5563]">
+                            {rules.allowEvents && <span>Eventos: {rules.allowEvents}</span>}
+                            {rules.allowChildren && <span>Crianças: {rules.allowChildren}</span>}
+                            {rules.allowSmoking && <span>Fumar: {rules.allowSmoking}</span>}
+                            {rules.allowPets && <span>Pets: {rules.allowPets}</span>}
+                          </div>
+                        )}
+                        {s.description && (
+                          <div>
+                            <strong className="block mb-1">Descrição:</strong>
+                            <p className="whitespace-pre-wrap text-[#4B5563]">{s.description}</p>
+                          </div>
+                        )}
+                        <div className="flex gap-2 pt-2">
+                          <a href={`https://wa.me/${s.phone.replace(/\D/g, '')}?text=${encodeURIComponent('Olá ' + s.name + '! Recebemos seu cadastro do imóvel no Hospeda Temporada.')}`}
+                            target="_blank" rel="noreferrer"
+                            className="px-3 py-1.5 text-sm rounded-lg bg-[#25D366] text-white hover:bg-[#128C7E]">
+                            💬 WhatsApp
+                          </a>
+                          {s.email && (
+                            <a href={`mailto:${s.email}`} className="px-3 py-1.5 text-sm rounded-lg border border-[#D1D5DB] text-[#4B5563]">
+                              ✉️ Email
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </main>

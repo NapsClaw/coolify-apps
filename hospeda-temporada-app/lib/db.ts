@@ -83,6 +83,27 @@ async function initDb() {
   await sql`ALTER TABLE pricing_rules ADD COLUMN IF NOT EXISTS min_nights INTEGER`;
   await sql`ALTER TABLE properties ADD COLUMN IF NOT EXISTS checkin_time TEXT`;
   await sql`ALTER TABLE properties ADD COLUMN IF NOT EXISTS checkout_time TEXT`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS property_submissions (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      email TEXT,
+      address TEXT NOT NULL,
+      intent TEXT NOT NULL DEFAULT 'temporada',
+      description TEXT,
+      images JSONB NOT NULL DEFAULT '[]',
+      details JSONB NOT NULL DEFAULT '{}',
+      status TEXT NOT NULL DEFAULT 'pending',
+      admin_notes TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_property_submissions_status ON property_submissions(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_property_submissions_created ON property_submissions(created_at DESC)`;
+  await sql`ALTER TABLE property_submissions ADD COLUMN IF NOT EXISTS details JSONB NOT NULL DEFAULT '{}'`;
 }
 
 async function ensureDb() {

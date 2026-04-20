@@ -344,6 +344,74 @@ export async function deletePricingRule(id: number) {
   return sql`DELETE FROM pricing_rules WHERE id = ${id}`;
 }
 
+// ─── Property Submissions (cadastro público) ───
+
+export async function createPropertySubmission(data: {
+  name: string;
+  phone: string;
+  email?: string | null;
+  address: string;
+  intent: string;
+  description?: string | null;
+  images?: string[];
+  details?: Record<string, unknown>;
+}) {
+  await ensureDb();
+  const sql = getDb();
+  const rows = await sql`
+    INSERT INTO property_submissions (name, phone, email, address, intent, description, images, details, status)
+    VALUES (
+      ${data.name},
+      ${data.phone},
+      ${data.email ?? null},
+      ${data.address},
+      ${data.intent},
+      ${data.description ?? null},
+      ${JSON.stringify(data.images ?? [])},
+      ${JSON.stringify(data.details ?? {})},
+      'pending'
+    )
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function getAllSubmissions(status?: string) {
+  await ensureDb();
+  const sql = getDb();
+  if (status) {
+    return sql`SELECT * FROM property_submissions WHERE status = ${status} ORDER BY created_at DESC`;
+  }
+  return sql`SELECT * FROM property_submissions ORDER BY created_at DESC`;
+}
+
+export async function updateSubmissionStatus(id: number, status: string, adminNotes?: string | null) {
+  await ensureDb();
+  const sql = getDb();
+  if (adminNotes !== undefined) {
+    const rows = await sql`
+      UPDATE property_submissions
+      SET status = ${status}, admin_notes = ${adminNotes}, updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING *
+    `;
+    return rows[0];
+  }
+  const rows = await sql`
+    UPDATE property_submissions
+    SET status = ${status}, updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function deleteSubmission(id: number) {
+  await ensureDb();
+  const sql = getDb();
+  return sql`DELETE FROM property_submissions WHERE id = ${id}`;
+}
+
 export async function getPropertyBasePrice(propertyId: string): Promise<number | null> {
   await ensureDb();
   const sql = getDb();

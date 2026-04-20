@@ -28,12 +28,27 @@ export default async function Home() {
             className="h-14 sm:h-16 w-auto object-contain"
           />
         </a>
-        <a
-          href="#imoveis"
-          className="bg-[#2563EB] text-white px-5 py-2.5 rounded text-[13px] font-semibold no-underline"
-        >
-          Ver imóveis
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="/cadastrar-imovel"
+            className="hidden sm:inline-block border border-[#2563EB] text-[#2563EB] px-4 py-2.5 rounded text-[13px] font-semibold no-underline hover:bg-[#EFF6FF] transition"
+          >
+            Cadastre seu imóvel
+          </a>
+          <a
+            href="/cadastrar-imovel"
+            className="sm:hidden bg-white border border-[#2563EB] text-[#2563EB] px-3 py-2.5 rounded text-[12px] font-semibold no-underline"
+            aria-label="Cadastre seu imóvel"
+          >
+            Cadastrar
+          </a>
+          <a
+            href="#imoveis"
+            className="bg-[#2563EB] text-white px-5 py-2.5 rounded text-[13px] font-semibold no-underline"
+          >
+            Ver imóveis
+          </a>
+        </div>
       </nav>
 
       <Hero />
