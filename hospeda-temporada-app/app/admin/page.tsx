@@ -167,6 +167,15 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<number | string | null>(null);
   const [uploadingImages, setUploadingImages] = useState(false);
 
+  // Toast
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showToast = useCallback((msg: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast(msg);
+    toastTimer.current = setTimeout(() => setToast(null), 1800);
+  }, []);
+
   // Precos tab
   interface PricingRuleLocal {
     id: number;
@@ -356,6 +365,7 @@ export default function AdminPage() {
         if (res.ok) {
           const saved = await res.json();
           setPricingRules(prev => prev.map(r => r.id === saved.id ? saved : r));
+          showToast('Atualizado');
         }
       } else {
         // POST: wait for server to get the new id, then append
@@ -366,10 +376,11 @@ export default function AdminPage() {
         if (res.ok) {
           const created = await res.json();
           setPricingRules(prev => [...prev, created]);
+          showToast('Criado');
         }
       }
     } catch (err) { console.error(err); }
-  }, [fetchApi, pricingProperty]);
+  }, [fetchApi, pricingProperty, showToast]);
 
   // Reset local prices only when switching properties — not on every rule change.
   // This prevents overwriting fields the user is actively typing into.
@@ -424,6 +435,7 @@ export default function AdminPage() {
     try {
       const res = await fetchApi('/api/pricing', { method: 'DELETE', body: JSON.stringify({ id }) });
       if (!res.ok) setPricingRules(snapshot);
+      else showToast('Removido');
     } catch (err) {
       console.error(err);
       setPricingRules(snapshot);
@@ -608,13 +620,15 @@ export default function AdminPage() {
               ? { ...p, ...(updated?.id ? updated : payload) }
               : p
           ));
+          showToast('Atualizado');
         }
       } else {
-        await fetchApi('/api/properties', {
+        const res = await fetchApi('/api/properties', {
           method: 'POST',
           body: JSON.stringify(payload),
         });
         await loadProperties();
+        if (res.ok) showToast('Criado');
       }
       setShowPropertyForm(false);
       setEditingProperty(null);
@@ -2127,6 +2141,25 @@ export default function AdminPage() {
           </div>
         )}
       </main>
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-4 right-4 z-[200] bg-[#111827] text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 animate-[toast-in_0.2s_ease-out]"
+          style={{ animation: 'toast-in 0.2s ease-out' }}
+        >
+          <svg className="w-4 h-4 text-[#22c55e]" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          {toast}
+        </div>
+      )}
+      <style jsx>{`
+        @keyframes toast-in {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
