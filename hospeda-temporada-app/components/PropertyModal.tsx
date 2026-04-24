@@ -61,7 +61,8 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
     nights?: number;
     breakdown?: { date: string; label: string; price: number }[];
     subtotal?: number;
-    guest_surcharge?: { extra_guests: number; per_night: number; total: number } | null;
+    guest_surcharge?: { extra_guests: number; total: number } | null;
+    cleaning_fee?: { amount: number; label: string } | null;
     total?: number;
     min_nights_violations?: MinNightsViolation[];
   } | null>(null);
@@ -444,6 +445,16 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
                   </span>
                   <span className="font-sans text-sm text-[#111827]">
                     R$ {priceBreakdown.guest_surcharge.total.toLocaleString('pt-BR')}
+                  </span>
+                </div>
+              )}
+              {priceBreakdown.cleaning_fee && priceBreakdown.cleaning_fee.amount > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="font-sans text-sm text-[#4B5563]">
+                    {priceBreakdown.cleaning_fee.label}
+                  </span>
+                  <span className="font-sans text-sm text-[#111827]">
+                    R$ {priceBreakdown.cleaning_fee.amount.toLocaleString('pt-BR')}
                   </span>
                 </div>
               )}

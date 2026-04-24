@@ -41,6 +41,7 @@ export interface PricingRule {
   min_guests: number | null;
   price_per_extra_guest: number | null;
   min_nights: number | null;
+  cleaning_fee: number | null;
   label: string | null;
   priority: number;
   active: boolean;
@@ -58,7 +59,8 @@ export interface PriceBreakdown {
   nights?: number;
   breakdown?: { date: string; label: string; price: number }[];
   subtotal?: number;
-  guest_surcharge?: { extra_guests: number; per_night: number; total: number } | null;
+  guest_surcharge?: { extra_guests: number; total: number } | null;
+  cleaning_fee?: { amount: number; label: string } | null;
   total?: number;
   min_nights_violations?: MinNightsViolation[];
 }

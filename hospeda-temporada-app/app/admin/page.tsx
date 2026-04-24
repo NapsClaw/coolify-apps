@@ -212,6 +212,7 @@ export default function AdminPage() {
     min_guests: number | null;
     price_per_extra_guest: number | null;
     min_nights: number | null;
+    cleaning_fee: number | null;
     label: string | null;
     priority: number;
     active: boolean;
@@ -462,6 +463,7 @@ export default function AdminPage() {
     const base = pricingRules.find(r => r.rule_type === 'base');
     if (base?.price_per_night != null) seed['base'] = String(base.price_per_night);
     if (base?.min_nights != null) seed['base_min_nights'] = String(base.min_nights);
+    if (base?.cleaning_fee != null) seed['base_cleaning'] = String(base.cleaning_fee);
     const weekend = pricingRules.find(r => r.rule_type === 'weekend');
     if (weekend?.price_per_night != null) seed['weekend'] = String(weekend.price_per_night);
     if (weekend?.min_nights != null) seed['weekend_min_nights'] = String(weekend.min_nights);
@@ -474,11 +476,15 @@ export default function AdminPage() {
       if (r.season_start_day != null) seed[`seasonal_start_day_${r.id}`] = String(r.season_start_day);
       if (r.season_end_day != null) seed[`seasonal_end_day_${r.id}`] = String(r.season_end_day);
       if (r.min_nights != null) seed[`seasonal_min_nights_${r.id}`] = String(r.min_nights);
+      if (r.price_per_extra_guest != null) seed[`seasonal_extra_${r.id}`] = String(r.price_per_extra_guest);
+      if (r.cleaning_fee != null) seed[`seasonal_cleaning_${r.id}`] = String(r.cleaning_fee);
     });
     pricingRules.filter(r => r.rule_type === 'custom').forEach(r => {
       if (r.price_per_night != null) seed[`custom_${r.id}`] = String(r.price_per_night);
       if (r.label != null) seed[`custom_label_${r.id}`] = r.label;
       if (r.min_nights != null) seed[`custom_min_nights_${r.id}`] = String(r.min_nights);
+      if (r.price_per_extra_guest != null) seed[`custom_extra_${r.id}`] = String(r.price_per_extra_guest);
+      if (r.cleaning_fee != null) seed[`custom_cleaning_${r.id}`] = String(r.cleaning_fee);
     });
     setLocalPrices(prev => {
       const next = { ...prev };
@@ -1489,6 +1495,28 @@ export default function AdminPage() {
                       </div>
                       <p className="text-xs text-[#9CA3AF] mt-1">Aplica em qualquer reserva. Deixe vazio para sem mínimo.</p>
                     </div>
+                    <div className="mt-3 pt-3 border-t border-[#BFDBFE]/50">
+                      <label className="block text-sm text-[#4B5563] mb-1">Taxa de limpeza</label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-[#4B5563]">R$</span>
+                        <input
+                          type="number"
+                          min={0}
+                          value={localPrices['base_cleaning'] ?? ''}
+                          onChange={e => {
+                            setLocalPrices(prev => ({ ...prev, base_cleaning: e.target.value }));
+                            const raw = e.target.value.trim();
+                            const val = raw === '' ? null : Math.max(0, parseInt(raw) || 0);
+                            const existing = pricingRules.find(r => r.rule_type === 'base');
+                            debouncedSavePricingRule('base_cleaning', { id: existing?.id, rule_type: 'base', cleaning_fee: val });
+                          }}
+                          placeholder="sem taxa"
+                          className="w-32 px-3 py-2 border border-[#BFDBFE] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                        />
+                        <span className="text-xs text-[#4B5563]">por reserva</span>
+                      </div>
+                      <p className="text-xs text-[#9CA3AF] mt-1">Cobrada uma vez na reserva. Temporadas/datas podem sobrescrever.</p>
+                    </div>
                   </div>
 
                   {/* Weekend price */}
@@ -1667,6 +1695,40 @@ export default function AdminPage() {
                           />
                           <span className="text-sm text-[#4B5563]">noites dentro do período</span>
                         </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-[#4B5563]">+ R$</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={localPrices[`seasonal_extra_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`seasonal_extra_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(0, parseInt(raw) || 0);
+                              debouncedSavePricingRule(`seasonal_extra_${rule.id}`, { id: rule.id, rule_type: 'seasonal', price_per_extra_guest: val });
+                            }}
+                            placeholder="usa geral"
+                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">/ hóspede extra / noite</span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-[#4B5563]">Limpeza R$</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={localPrices[`seasonal_cleaning_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`seasonal_cleaning_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(0, parseInt(raw) || 0);
+                              debouncedSavePricingRule(`seasonal_cleaning_${rule.id}`, { id: rule.id, rule_type: 'seasonal', cleaning_fee: val });
+                            }}
+                            placeholder="usa geral"
+                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">por reserva</span>
+                        </div>
                       </div>
                     ))}
                     {pricingRules.filter(r => r.rule_type === 'seasonal').length === 0 && (
@@ -1730,6 +1792,40 @@ export default function AdminPage() {
                             className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                           />
                           <span className="text-sm text-[#4B5563]">noites dentro do período</span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-[#4B5563]">+ R$</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={localPrices[`custom_extra_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`custom_extra_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(0, parseInt(raw) || 0);
+                              debouncedSavePricingRule(`custom_extra_${rule.id}`, { id: rule.id, rule_type: 'custom', price_per_extra_guest: val });
+                            }}
+                            placeholder="usa geral"
+                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">/ hóspede extra / noite</span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-[#4B5563]">Limpeza R$</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={localPrices[`custom_cleaning_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`custom_cleaning_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(0, parseInt(raw) || 0);
+                              debouncedSavePricingRule(`custom_cleaning_${rule.id}`, { id: rule.id, rule_type: 'custom', cleaning_fee: val });
+                            }}
+                            placeholder="usa geral"
+                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">por reserva</span>
                         </div>
                       </div>
                     ))}

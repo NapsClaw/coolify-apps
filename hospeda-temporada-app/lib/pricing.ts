@@ -38,53 +38,56 @@ function eachNight(dateStart: string, dateEnd: string): string[] {
   return nights;
 }
 
-export function getPriceForDate(dateStr: string, rules: PricingRule[]): { price: number; label: string } | null {
+// Returns the PricingRule applied to a given date and the resolved price/label.
+// The returned `rule` is the RULE whose period the date falls under (custom/seasonal/base),
+// which may differ from the rule whose `price_per_night` wins (e.g., weekend premium inside a season).
+export function getRuleForDate(
+  dateStr: string,
+  rules: PricingRule[]
+): { price: number; label: string; rule: PricingRule } | null {
   const baseRule = rules.find(r => r.rule_type === 'base');
   if (!baseRule?.price_per_night) return null;
 
   const date = new Date(dateStr + 'T12:00:00');
-  const dayOfWeek = date.getDay(); // 0=Sun, 6=Sat
+  const dayOfWeek = date.getDay();
 
-  // 1. Custom override (highest priority)
   const customRules = rules
     .filter(r => r.rule_type === 'custom' && r.date_start && r.date_end)
     .sort((a, b) => (b.priority || 0) - (a.priority || 0));
-
   for (const rule of customRules) {
     if (isDateInRange(dateStr, rule.date_start!, rule.date_end!)) {
-      return { price: rule.price_per_night!, label: rule.label || 'Preço especial' };
+      return { price: rule.price_per_night!, label: rule.label || 'Preço especial', rule };
     }
   }
 
-  // 2. Seasonal
   const seasonalRules = rules
     .filter(r => r.rule_type === 'seasonal' && r.season_start_month != null)
     .sort((a, b) => (b.priority || 0) - (a.priority || 0));
-
   for (const rule of seasonalRules) {
     if (isDateInSeason(dateStr, rule.season_start_month!, rule.season_start_day || 1, rule.season_end_month!, rule.season_end_day || 31)) {
-      // Check if weekend within season
       const weekendRule = rules.find(r => r.rule_type === 'weekend');
       if (weekendRule?.price_per_night && (weekendRule.weekend_days || [5, 6]).includes(dayOfWeek)) {
-        // Use the higher of seasonal or weekend price
         const seasonPrice = rule.price_per_night || baseRule.price_per_night;
-        const weekendPrice = weekendRule.price_per_night;
-        if (weekendPrice > seasonPrice) {
-          return { price: weekendPrice, label: `${rule.label || 'Temporada'} (fim de semana)` };
+        if (weekendRule.price_per_night > seasonPrice) {
+          return { price: weekendRule.price_per_night, label: `${rule.label || 'Temporada'} (fim de semana)`, rule };
         }
       }
-      return { price: rule.price_per_night || baseRule.price_per_night, label: rule.label || 'Temporada' };
+      return { price: rule.price_per_night || baseRule.price_per_night, label: rule.label || 'Temporada', rule };
     }
   }
 
-  // 3. Weekend
   const weekendRule = rules.find(r => r.rule_type === 'weekend');
   if (weekendRule?.price_per_night && (weekendRule.weekend_days || [5, 6]).includes(dayOfWeek)) {
-    return { price: weekendRule.price_per_night, label: 'Fim de semana' };
+    // Weekend-only stay: attribute to base for fee resolution.
+    return { price: weekendRule.price_per_night, label: 'Fim de semana', rule: baseRule };
   }
 
-  // 4. Base
-  return { price: baseRule.price_per_night, label: 'Diária base' };
+  return { price: baseRule.price_per_night, label: 'Diária base', rule: baseRule };
+}
+
+export function getPriceForDate(dateStr: string, rules: PricingRule[]): { price: number; label: string } | null {
+  const r = getRuleForDate(dateStr, rules);
+  return r ? { price: r.price, label: r.label } : null;
 }
 
 function computeMinNightsViolations(
@@ -172,28 +175,55 @@ export function calculateStayPrice(
     return { has_dynamic_pricing: true, nights: 0, breakdown: [], subtotal: 0, total: 0 };
   }
 
-  const breakdown = nights.map(date => {
-    const result = getPriceForDate(date, rules)!;
-    return { date, label: result.label, price: result.price };
-  });
-
+  const nightlyRules = nights.map(date => ({ date, ...getRuleForDate(date, rules)! }));
+  const breakdown = nightlyRules.map(n => ({ date: n.date, label: n.label, price: n.price }));
   const subtotal = breakdown.reduce((sum, b) => sum + b.price, 0);
 
-  // Guest surcharge
-  const surchargeRule = rules.find(r => r.rule_type === 'guest_surcharge');
+  // Guest surcharge: per-night rate comes from the applied rule's own price_per_extra_guest,
+  // falling back to the global guest_surcharge rule. min_guests stays global.
+  const globalSurcharge = rules.find(r => r.rule_type === 'guest_surcharge');
+  const threshold = globalSurcharge?.min_guests ?? 0;
   let guestSurcharge: PriceBreakdown['guest_surcharge'] = null;
 
-  if (surchargeRule?.min_guests && surchargeRule.price_per_extra_guest && guests > surchargeRule.min_guests) {
-    const extraGuests = guests - surchargeRule.min_guests;
-    const surchargeTotal = extraGuests * surchargeRule.price_per_extra_guest * nights.length;
-    guestSurcharge = {
-      extra_guests: extraGuests,
-      per_night: surchargeRule.price_per_extra_guest,
-      total: surchargeTotal,
-    };
+  if (threshold && guests > threshold) {
+    const extraGuests = guests - threshold;
+    const globalRate = globalSurcharge?.price_per_extra_guest ?? 0;
+    let surchargeTotal = 0;
+    for (const n of nightlyRules) {
+      const nightRate = n.rule.price_per_extra_guest ?? globalRate;
+      surchargeTotal += extraGuests * nightRate;
+    }
+    if (surchargeTotal > 0) {
+      guestSurcharge = { extra_guests: extraGuests, total: surchargeTotal };
+    }
   }
 
-  const total = subtotal + (guestSurcharge?.total || 0);
+  // Cleaning fee: one-time per stay. Priority: custom > seasonal > base.
+  // Pick the highest-priority rule hit by any night that has a non-null cleaning_fee.
+  let cleaningFee: PriceBreakdown['cleaning_fee'] = null;
+  const hitCustom = nightlyRules
+    .filter(n => n.rule.rule_type === 'custom')
+    .map(n => n.rule)
+    .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  const hitSeasonal = nightlyRules
+    .filter(n => n.rule.rule_type === 'seasonal')
+    .map(n => n.rule)
+    .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  const candidates = [...hitCustom, ...hitSeasonal, baseRule];
+  const seen = new Set<number>();
+  for (const r of candidates) {
+    if (seen.has(r.id)) continue;
+    seen.add(r.id);
+    if (r.cleaning_fee && r.cleaning_fee > 0) {
+      const label = r.rule_type === 'base'
+        ? 'Taxa de limpeza'
+        : `Taxa de limpeza · ${r.label || (r.rule_type === 'custom' ? 'Período especial' : 'Temporada')}`;
+      cleaningFee = { amount: r.cleaning_fee, label };
+      break;
+    }
+  }
+
+  const total = subtotal + (guestSurcharge?.total || 0) + (cleaningFee?.amount || 0);
   const min_nights_violations = computeMinNightsViolations(rules, nights);
 
   return {
@@ -202,6 +232,7 @@ export function calculateStayPrice(
     breakdown,
     subtotal,
     guest_surcharge: guestSurcharge,
+    cleaning_fee: cleaningFee,
     total,
     min_nights_violations,
   };
