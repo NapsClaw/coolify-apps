@@ -476,6 +476,7 @@ export default function AdminPage() {
       if (r.season_start_day != null) seed[`seasonal_start_day_${r.id}`] = String(r.season_start_day);
       if (r.season_end_day != null) seed[`seasonal_end_day_${r.id}`] = String(r.season_end_day);
       if (r.min_nights != null) seed[`seasonal_min_nights_${r.id}`] = String(r.min_nights);
+      if (r.min_guests != null) seed[`seasonal_min_guests_${r.id}`] = String(r.min_guests);
       if (r.price_per_extra_guest != null) seed[`seasonal_extra_${r.id}`] = String(r.price_per_extra_guest);
       if (r.cleaning_fee != null) seed[`seasonal_cleaning_${r.id}`] = String(r.cleaning_fee);
     });
@@ -483,6 +484,7 @@ export default function AdminPage() {
       if (r.price_per_night != null) seed[`custom_${r.id}`] = String(r.price_per_night);
       if (r.label != null) seed[`custom_label_${r.id}`] = r.label;
       if (r.min_nights != null) seed[`custom_min_nights_${r.id}`] = String(r.min_nights);
+      if (r.min_guests != null) seed[`custom_min_guests_${r.id}`] = String(r.min_guests);
       if (r.price_per_extra_guest != null) seed[`custom_extra_${r.id}`] = String(r.price_per_extra_guest);
       if (r.cleaning_fee != null) seed[`custom_cleaning_${r.id}`] = String(r.cleaning_fee);
     });
@@ -1696,7 +1698,21 @@ export default function AdminPage() {
                           <span className="text-sm text-[#4B5563]">noites dentro do período</span>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm text-[#4B5563]">+ R$</span>
+                          <span className="text-sm text-[#4B5563]">A partir de</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={localPrices[`seasonal_min_guests_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`seasonal_min_guests_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(0, parseInt(raw) || 0);
+                              debouncedSavePricingRule(`seasonal_min_guests_${rule.id}`, { id: rule.id, rule_type: 'seasonal', min_guests: val });
+                            }}
+                            placeholder="usa geral"
+                            className="w-20 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">pessoas, + R$</span>
                           <input
                             type="number"
                             min={0}
@@ -1708,9 +1724,9 @@ export default function AdminPage() {
                               debouncedSavePricingRule(`seasonal_extra_${rule.id}`, { id: rule.id, rule_type: 'seasonal', price_per_extra_guest: val });
                             }}
                             placeholder="usa geral"
-                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                            className="w-20 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                           />
-                          <span className="text-sm text-[#4B5563]">/ hóspede extra / noite</span>
+                          <span className="text-sm text-[#4B5563]">/ pessoa / noite</span>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm text-[#4B5563]">Limpeza R$</span>
@@ -1794,7 +1810,21 @@ export default function AdminPage() {
                           <span className="text-sm text-[#4B5563]">noites dentro do período</span>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm text-[#4B5563]">+ R$</span>
+                          <span className="text-sm text-[#4B5563]">A partir de</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={localPrices[`custom_min_guests_${rule.id}`] ?? ''}
+                            onChange={e => {
+                              setLocalPrices(prev => ({ ...prev, [`custom_min_guests_${rule.id}`]: e.target.value }));
+                              const raw = e.target.value.trim();
+                              const val = raw === '' ? null : Math.max(0, parseInt(raw) || 0);
+                              debouncedSavePricingRule(`custom_min_guests_${rule.id}`, { id: rule.id, rule_type: 'custom', min_guests: val });
+                            }}
+                            placeholder="usa geral"
+                            className="w-20 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                          />
+                          <span className="text-sm text-[#4B5563]">pessoas, + R$</span>
                           <input
                             type="number"
                             min={0}
@@ -1806,9 +1836,9 @@ export default function AdminPage() {
                               debouncedSavePricingRule(`custom_extra_${rule.id}`, { id: rule.id, rule_type: 'custom', price_per_extra_guest: val });
                             }}
                             placeholder="usa geral"
-                            className="w-28 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                            className="w-20 px-2 py-1.5 border border-[#BFDBFE] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
                           />
-                          <span className="text-sm text-[#4B5563]">/ hóspede extra / noite</span>
+                          <span className="text-sm text-[#4B5563]">/ pessoa / noite</span>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm text-[#4B5563]">Limpeza R$</span>

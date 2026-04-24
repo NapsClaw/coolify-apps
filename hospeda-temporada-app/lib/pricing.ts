@@ -179,23 +179,25 @@ export function calculateStayPrice(
   const breakdown = nightlyRules.map(n => ({ date: n.date, label: n.label, price: n.price }));
   const subtotal = breakdown.reduce((sum, b) => sum + b.price, 0);
 
-  // Guest surcharge: per-night rate comes from the applied rule's own price_per_extra_guest,
-  // falling back to the global guest_surcharge rule. min_guests stays global.
+  // Guest surcharge: per-night threshold and rate come from the applied rule when set,
+  // falling back to the global guest_surcharge rule.
   const globalSurcharge = rules.find(r => r.rule_type === 'guest_surcharge');
-  const threshold = globalSurcharge?.min_guests ?? 0;
+  const globalThreshold = globalSurcharge?.min_guests ?? 0;
+  const globalRate = globalSurcharge?.price_per_extra_guest ?? 0;
   let guestSurcharge: PriceBreakdown['guest_surcharge'] = null;
 
-  if (threshold && guests > threshold) {
-    const extraGuests = guests - threshold;
-    const globalRate = globalSurcharge?.price_per_extra_guest ?? 0;
-    let surchargeTotal = 0;
-    for (const n of nightlyRules) {
-      const nightRate = n.rule.price_per_extra_guest ?? globalRate;
-      surchargeTotal += extraGuests * nightRate;
-    }
-    if (surchargeTotal > 0) {
-      guestSurcharge = { extra_guests: extraGuests, total: surchargeTotal };
-    }
+  let surchargeTotal = 0;
+  let maxExtras = 0;
+  for (const n of nightlyRules) {
+    const threshold = n.rule.min_guests ?? globalThreshold;
+    if (!threshold || guests <= threshold) continue;
+    const extras = guests - threshold;
+    const rate = n.rule.price_per_extra_guest ?? globalRate;
+    surchargeTotal += extras * rate;
+    if (extras > maxExtras) maxExtras = extras;
+  }
+  if (surchargeTotal > 0) {
+    guestSurcharge = { extra_guests: maxExtras, total: surchargeTotal };
   }
 
   // Cleaning fee: one-time per stay. Priority: custom > seasonal > base.
