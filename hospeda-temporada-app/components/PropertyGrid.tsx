@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Property } from "@/components/types";
 import SearchBar from "@/components/SearchBar";
 import PropertyCard from "@/components/PropertyCard";
@@ -10,12 +10,42 @@ interface PropertyGridProps {
   initialProperties: Property[];
 }
 
+const QUERY_PARAM = "imovel";
+
 export default function PropertyGrid({ initialProperties: properties }: PropertyGridProps) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null
   );
+
+  const openProperty = useCallback(
+    (property: Property | null) => {
+      setSelectedProperty(property);
+      if (typeof window === "undefined") return;
+      const url = new URL(window.location.href);
+      if (property) {
+        url.searchParams.set(QUERY_PARAM, property.id);
+      } else {
+        url.searchParams.delete(QUERY_PARAM);
+      }
+      window.history.replaceState({}, "", url.toString());
+    },
+    []
+  );
+
+  // Open modal from URL on mount + react to back/forward
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sync = () => {
+      const id = new URL(window.location.href).searchParams.get(QUERY_PARAM);
+      const found = id ? properties.find((p) => p.id === id) ?? null : null;
+      setSelectedProperty(found);
+    };
+    sync();
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, [properties]);
 
   function handleFilter(q: string, t: string) {
     setQuery(q);
@@ -66,7 +96,7 @@ export default function PropertyGrid({ initialProperties: properties }: Property
               <PropertyCard
                 key={property.id}
                 property={property}
-                onOpen={() => setSelectedProperty(property)}
+                onOpen={() => openProperty(property)}
               />
             ))}
           </div>
@@ -75,7 +105,7 @@ export default function PropertyGrid({ initialProperties: properties }: Property
 
       <PropertyModal
         property={selectedProperty}
-        onClose={() => setSelectedProperty(null)}
+        onClose={() => openProperty(null)}
       />
     </section>
   );

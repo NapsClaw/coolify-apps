@@ -54,6 +54,32 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
   });
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = useCallback(async () => {
+    if (!property || typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("imovel", property.id);
+    const link = url.toString();
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = link;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+      } catch {
+        // ignore — copy unsupported
+      }
+      document.body.removeChild(textarea);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [property]);
 
   // Pricing
   const [priceBreakdown, setPriceBreakdown] = useState<{
@@ -234,19 +260,43 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
 
       {/* Modal */}
       <div
-        className="relative z-10 bg-white w-full max-w-[580px] mx-4 my-8 rounded-2xl overflow-hidden shadow-2xl"
+        className="relative z-10 bg-white w-full max-w-[580px] lg:max-w-[1080px] mx-4 my-8 rounded-2xl overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
-          aria-label="Fechar"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Top-right action buttons */}
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+          <button
+            onClick={handleCopyLink}
+            className="h-9 px-3 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center gap-1.5 text-xs font-sans font-semibold transition-colors"
+            aria-label="Copiar link deste imóvel"
+            title="Copiar link deste imóvel"
+          >
+            {copied ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                Copiado!
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                Copiar link
+              </>
+            )}
+          </button>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
+            aria-label="Fechar"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         {/* Success banner */}
         {showSuccess && (
@@ -255,6 +305,8 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
           </div>
         )}
 
+        <div className="lg:flex lg:items-stretch">
+        <div className="lg:w-1/2 lg:flex lg:flex-col">
         {/* Gallery */}
         <div className="relative group">
           <img
@@ -322,7 +374,7 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
         )}
 
         {/* Property details */}
-        <div className="px-5 py-4 flex flex-col gap-3 border-b border-[#BFDBFE]/30">
+        <div className="px-5 py-4 flex flex-col gap-3 border-b border-[#BFDBFE]/30 lg:border-b-0 lg:flex-1">
           <h2 className="font-serif text-2xl text-[#111827]">{property.name}</h2>
 
           <p className="text-[#4B5563] font-sans text-sm flex items-center gap-1.5">
@@ -365,6 +417,8 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
           </div>
         </div>
 
+        </div>
+        <div className="lg:w-1/2 lg:border-l lg:border-[#BFDBFE]/30 lg:flex lg:flex-col">
         {/* Calendar section */}
         <div className="px-5 py-4 border-b border-[#BFDBFE]/30">
           <h3 className="font-serif text-lg text-[#111827] mb-3">
@@ -570,6 +624,8 @@ export default function PropertyModal({ property, onClose }: PropertyModalProps)
           >
             Ou fale direto no WhatsApp
           </a>
+        </div>
+        </div>
         </div>
       </div>
 
