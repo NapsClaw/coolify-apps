@@ -25,6 +25,25 @@ CREATE TABLE IF NOT EXISTS codes (
 CREATE INDEX IF NOT EXISTS idx_codes_status ON codes(status);
 CREATE INDEX IF NOT EXISTS idx_codes_created_at ON codes(created_at DESC);
 
+-- Numeração interna 1–100 da campanha e prêmio (se houver) de cada número.
+-- Tabela de controle interno da organização: nunca é consultada pela página pública
+-- nem por nenhuma rota que responda ao participante. O preenchimento do prêmio de
+-- cada número é feito só uma vez, via scripts/seed-raffle-numbers.ts.
+CREATE TABLE IF NOT EXISTS raffle_numbers (
+  number INTEGER PRIMARY KEY CHECK (number BETWEEN 1 AND 100),
+  prize_label TEXT,
+  assigned_at TIMESTAMPTZ,
+  delivered_at TIMESTAMPTZ,
+  delivered_note TEXT
+);
+
+-- Cada código, quando gerado, reivindica atomicamente um número livre (1–100).
+-- prize_label fica copiado no código no momento da geração, para o resgate
+-- (/api/redeem) não depender de nenhuma tabela/consulta extra nem de regra
+-- embutida em código-fonte de rota pública.
+ALTER TABLE codes ADD COLUMN IF NOT EXISTS raffle_number INTEGER UNIQUE REFERENCES raffle_numbers(number);
+ALTER TABLE codes ADD COLUMN IF NOT EXISTS prize_label TEXT;
+
 -- Auditoria simples de tentativas de resgate (inclusive inválidas), sem dados sensíveis.
 CREATE TABLE IF NOT EXISTS redeem_attempts (
   id SERIAL PRIMARY KEY,

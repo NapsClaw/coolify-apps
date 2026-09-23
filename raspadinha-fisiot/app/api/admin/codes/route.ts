@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { generateUniqueCode } from '@/lib/codes';
+import { generateCodeWithRaffleNumber } from '@/lib/codes';
 import { getSession } from '@/lib/auth';
 
 export async function GET() {
   const rows = await sql`
-    SELECT id, code, nome, whatsapp, status, created_at, sent_at, used_at
+    SELECT id, code, nome, whatsapp, status, created_at, sent_at, used_at, raffle_number, prize_label
     FROM codes
     ORDER BY created_at DESC
     LIMIT 500
@@ -20,15 +20,31 @@ export async function POST(req: NextRequest) {
     const nome = String(body.nome || '').trim().slice(0, 120) || null;
     const whatsapp = String(body.whatsapp || '').trim().slice(0, 40) || null;
 
-    const code = await generateUniqueCode();
+    let raffleNumber: number | null = null;
+    if (body.raffleNumber !== undefined && body.raffleNumber !== null && body.raffleNumber !== '') {
+      const n = Number(body.raffleNumber);
+      if (!Number.isInteger(n) || n < 1 || n > 100) {
+        return NextResponse.json({ ok: false, error: 'Número inválido. Use um valor entre 1 e 100.' }, { status: 400 });
+      }
+      raffleNumber = n;
+    }
 
-    const rows = await sql`
-      INSERT INTO codes (code, nome, whatsapp, status, created_by)
-      VALUES (${code}, ${nome}, ${whatsapp}, 'novo', ${session?.adminId ?? null})
-      RETURNING id, code, nome, whatsapp, status, created_at
-    `;
+    const result = await generateCodeWithRaffleNumber({
+      nome,
+      whatsapp,
+      createdBy: session?.adminId ?? null,
+      raffleNumber,
+    });
 
-    return NextResponse.json({ ok: true, code: rows[0] });
+    if (!result.ok) {
+      const error =
+        result.reason === 'number_taken'
+          ? 'Esse número já foi usado por outro código.'
+          : 'Todos os 100 números já foram usados. Não é possível gerar mais códigos desta campanha.';
+      return NextResponse.json({ ok: false, error }, { status: 409 });
+    }
+
+    return NextResponse.json({ ok: true, code: result.row });
   } catch (err) {
     console.error('admin/codes POST error', err);
     return NextResponse.json({ ok: false, error: 'Erro ao gerar código.' }, { status: 500 });

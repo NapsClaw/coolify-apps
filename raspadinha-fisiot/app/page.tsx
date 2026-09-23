@@ -20,6 +20,10 @@ export default function HomePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
   const submitBtnRef = useRef<HTMLButtonElement>(null);
+  const scratchPrizeRef = useRef<HTMLDivElement>(null);
+  const prizeMedalRef = useRef<HTMLSpanElement>(null);
+  const prizeTitleRef = useRef<HTMLHeadingElement>(null);
+  const prizeTextRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     const form = formRef.current!;
@@ -31,6 +35,10 @@ export default function HomePage() {
     const canvas = canvasRef.current!;
     const confettiCanvas = confettiCanvasRef.current!;
     const submitBtn = submitBtnRef.current!;
+    const scratchPrize = scratchPrizeRef.current!;
+    const prizeMedal = prizeMedalRef.current!;
+    const prizeTitle = prizeTitleRef.current!;
+    const prizeText = prizeTextRef.current!;
 
     const ctx = canvas.getContext('2d')!;
     const cctx = confettiCanvas.getContext('2d')!;
@@ -39,6 +47,23 @@ export default function HomePage() {
     let revealed = false;
     let lastCheck = 0;
     let submitting = false;
+
+    // Resultado do participante, vindo do backend após validar o código.
+    // Mostra somente o resultado desta pessoa — nunca números, faixas ou regras internas.
+    function applyResult(prize: string | null) {
+      if (prize) {
+        scratchPrize.classList.add('is-winner');
+        prizeMedal.textContent = '🎉';
+        prizeTitle.textContent = 'Parabéns, você ganhou! 🎁';
+        prizeText.textContent = `Você ganhou: ${prize}. Fale com a organização pelo WhatsApp para combinar a retirada.`;
+      } else {
+        scratchPrize.classList.remove('is-winner');
+        prizeMedal.textContent = '🎗️';
+        prizeTitle.textContent = 'Obrigada por participar! 💗';
+        prizeText.textContent =
+          'Sua raspadinha apoia a campanha de prevenção da Caminhada FISIOT por Elas. Continue com a gente!';
+      }
+    }
 
     function showError(text: string) {
       msg.textContent = text;
@@ -83,6 +108,7 @@ export default function HomePage() {
 
         if (data.ok) {
           showOk('Código válido! Preparando sua raspadinha…');
+          applyResult(data.prize ?? null);
           unlockScratch();
         } else {
           showError(data.error || 'Código inválido. Confira com a organização e tente novamente.');
@@ -106,6 +132,7 @@ export default function HomePage() {
 
     function handleTryAnother() {
       scratchSection.classList.remove('is-active');
+      scratchPrize.classList.remove('is-winner');
       accessSection.style.display = '';
       input.value = '';
       msg.textContent = '';
@@ -432,10 +459,10 @@ export default function HomePage() {
           <p className="instructions">Use o dedo no celular ou arraste o mouse sobre a área abaixo.</p>
 
           <div className="scratch-frame">
-            <div className="scratch-prize">
-              <span className="medal">🎗️</span>
-              <h3>Surpresa especial da Caminhada FISIOT por Elas</h3>
-              <p>Para saber os detalhes da sua surpresa, fale com a organização pelo WhatsApp.</p>
+            <div className="scratch-prize" ref={scratchPrizeRef}>
+              <span className="medal" ref={prizeMedalRef}>🎗️</span>
+              <h3 ref={prizeTitleRef}>Surpresa especial da Caminhada FISIOT por Elas</h3>
+              <p ref={prizeTextRef}>Para saber os detalhes da sua surpresa, fale com a organização pelo WhatsApp.</p>
             </div>
             <canvas className="scratch-canvas" id="scratch-canvas" ref={canvasRef}></canvas>
           </div>

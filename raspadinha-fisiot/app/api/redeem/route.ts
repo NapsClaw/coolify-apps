@@ -23,16 +23,20 @@ export async function POST(req: NextRequest) {
 
     // UPDATE atômico: só marca como utilizado se ainda não estiver.
     // É essa cláusula WHERE status <> 'utilizado' que impede reuso, mesmo com pedidos simultâneos.
+    // O prêmio (se houver) já vem copiado no código desde a geração no painel — então essa
+    // mesma instrução atômica também é o único lugar que decide e devolve o resultado do
+    // participante, sem nenhuma consulta extra a números/faixas/regras.
     const updated = await sql`
       UPDATE codes
       SET status = 'utilizado', used_at = now(), used_ip = ${ip}
       WHERE code = ${code} AND status <> 'utilizado'
-      RETURNING id
+      RETURNING id, prize_label
     `;
 
     if (updated.length > 0) {
       await sql`INSERT INTO redeem_attempts (code_attempted, result, ip) VALUES (${code}, 'sucesso', ${ip})`;
-      return NextResponse.json({ ok: true });
+      const prize = (updated[0] as { prize_label: string | null }).prize_label;
+      return NextResponse.json({ ok: true, prize: prize || null });
     }
 
     const existing = await sql`SELECT status FROM codes WHERE code = ${code} LIMIT 1`;
