@@ -368,11 +368,17 @@ export default function HomePage() {
           <span className="sparkle s1">✨</span>
           <span className="sparkle s2">🎀</span>
           <span className="sparkle s3">💗</span>
-          <img
-            className="mascote"
-            src="/assets/super-mama-capa.png"
-            alt="Super Mama, mascote da Caminhada FISIOT por Elas, acenando com o polegar para cima"
-          />
+          <div className="poster-card">
+            <span className="poster-card-badge">Arte oficial aprovada</span>
+            <img
+              className="poster-card-img"
+              src="/assets/cartaz-raspadinha-prevencao.jpg"
+              alt="Cartaz oficial da 1ª Raspadinha da Prevenção FISIOT por Elas: raspe e descubra se você ganhou, ganhe até R$ 300 em produtos Bellamama Cosméticos, 70% do valor arrecadado será destinado ao IREFIS — Outubro Rosa, movimento pela saúde, prevenção pela vida"
+              width={911}
+              height={1600}
+              loading="eager"
+            />
+          </div>
         </div>
       </section>
 
