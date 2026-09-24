@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-const WHATSAPP_NUMBER = '5531980550930';
+const WHATSAPP_NUMBER = '5531992594953';
 const WHATSAPP_HELP_TEXT = encodeURIComponent(
   'Olá! Não recebi meu código da raspadinha da Caminhada FISIOT por Elas.'
 );
@@ -544,7 +544,7 @@ export default function HomePage() {
           <details className="faq-item">
             <summary>Não recebi nenhum código, o que eu faço?</summary>
             <p className="faq-a">
-              Fale com a organização da Caminhada FISIOT por Elas pelo WhatsApp (31) 98055-0930 — o botão de
+              Fale com a organização da Caminhada FISIOT por Elas pelo WhatsApp (31) 99259-4953 — o botão de
               contato está logo acima do campo de código.
             </p>
           </details>
