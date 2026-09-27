@@ -354,7 +354,7 @@ export default function HomePage() {
     <div className="wrap">
       <header className="site-header">
         <div className="brandmark">
-          <img src="/assets/logo-fisiot.jpg" alt="FISIOT" />
+          <img src="/assets/logo-irefis.jpg" alt="Instituto IREFIS" />
           <div className="txt">
             <b>Raspadinha FISIOT por Elas</b>
             <span>Outubro Rosa · 1ª Caminhada Contra o Câncer</span>
@@ -528,7 +528,6 @@ export default function HomePage() {
           <p className="label">Uma iniciativa de apoio à Caminhada FISIOT por Elas</p>
           <div className="logo-row">
             <img src="/assets/logo-irefis.jpg" alt="Instituto IREFIS — Instituto de Reabilitação FISIOT em Saúde" />
-            <img src="/assets/logo-fisiot.jpg" alt="FISIOT — 15 anos, desde 1996" />
             <img src="/assets/logo-bellamama.jpg" alt="Bellamama Cosméticos" />
             <img src="/assets/logo-rede-olho-cancer.jpg" alt="Rede de Olho no Câncer" />
           </div>

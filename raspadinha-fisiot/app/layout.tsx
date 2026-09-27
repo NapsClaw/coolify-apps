@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Raspadinha FISIOT por Elas — Caminhada Contra o Câncer',
   description:
     'Recebeu um código da Caminhada FISIOT por Elas? Desbloqueie sua raspadinha e revele sua surpresa especial.',
-  icons: { icon: '/assets/logo-fisiot.jpg' },
+  icons: { icon: '/assets/logo-irefis.jpg' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
