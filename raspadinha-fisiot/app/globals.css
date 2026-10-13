@@ -201,6 +201,54 @@ body::before{
 @keyframes blobMove{ from{transform:rotate(0deg) scale(1);} to{transform:rotate(8deg) scale(1.05);} }
 @keyframes twinkle{ 0%,100%{opacity:.3; transform:scale(.85);} 50%{opacity:1; transform:scale(1.1);} }
 
+/* ---------- compra = raspadinha (regra comercial Bellamama) ---------- */
+.commercial-section{ padding:0 clamp(20px,5vw,56px) clamp(28px,5vw,48px); position:relative; z-index:2; }
+.commercial-inner{
+  max-width:760px; margin:0 auto; text-align:center; position:relative; overflow:hidden;
+  background:linear-gradient(135deg, rgba(217,73,126,.08), rgba(138,103,198,.08) 55%, rgba(75,201,172,.08));
+  border:1px solid rgba(217,73,126,.2); border-radius:var(--radius-lg);
+  padding:clamp(28px,4vw,44px); box-shadow:var(--shadow-soft);
+}
+.commercial-inner::before{
+  content:""; position:absolute; top:-54px; left:-54px; width:170px; height:170px; border-radius:50%;
+  background:radial-gradient(circle, rgba(240,209,143,.4), transparent 70%); z-index:0;
+}
+.commercial-inner .eyebrow{
+  display:inline-block; font-size:.76rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--rose-600); background:rgba(217,73,126,.14); padding:6px 16px; border-radius:999px;
+  margin-bottom:14px; position:relative; z-index:1;
+}
+.commercial-inner h2{
+  font-family:var(--font-display); font-size:clamp(1.45rem,3vw,1.95rem); margin:0 0 10px; color:var(--ink-900);
+  position:relative; z-index:1;
+}
+.commercial-lead{
+  color:var(--ink-700); font-size:.98rem; max-width:54ch; margin:0 auto 26px; line-height:1.6;
+  position:relative; z-index:1;
+}
+.commercial-cards{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin:0 0 22px;
+  position:relative; z-index:1;
+}
+.commercial-card{
+  background:var(--paper); border-radius:var(--radius-md); padding:24px 18px;
+  border:1px solid rgba(163,133,218,.2); box-shadow:0 16px 30px -20px rgba(44,24,48,.3);
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+.commercial-card img{
+  height:46px; width:auto; max-width:130px; object-fit:contain; border-radius:10px;
+  background:#fff; padding:4px; box-shadow:0 6px 14px -8px rgba(44,24,48,.3);
+}
+.commercial-rule{
+  font-family:var(--font-display); font-style:italic; font-weight:600; font-size:1.04rem;
+  color:var(--rose-700); margin:0; line-height:1.42;
+}
+.commercial-note{
+  font-size:.84rem; color:var(--ink-500); max-width:54ch; margin:0 auto 22px; line-height:1.55;
+  position:relative; z-index:1;
+}
+.commercial-cta{ position:relative; z-index:1; }
+
 /* ---------- access card ---------- */
 .access-section{ padding:0 clamp(20px,5vw,56px) clamp(40px,7vw,80px); position:relative; z-index:2; }
 .access-card{
@@ -417,6 +465,7 @@ body::before{
   .hero-art{ order:-1; max-width:340px; margin:0 auto; }
   .steps-grid{ grid-template-columns:1fr; }
   .footer-grid{ justify-content:center; text-align:center; }
+  .commercial-cards{ grid-template-columns:1fr; }
 }
 @media (max-width: 560px){
   .site-header{ flex-direction:column; align-items:flex-start; gap:12px; }

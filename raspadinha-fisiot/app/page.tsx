@@ -9,6 +9,9 @@ const WHATSAPP_HELP_TEXT = encodeURIComponent(
 const WHATSAPP_REVEAL_TEXT = encodeURIComponent(
   'Olá! Raspei minha raspadinha da Caminhada FISIOT por Elas e quero saber mais sobre minha surpresa 🎁'
 );
+const WHATSAPP_COMMERCIAL_TEXT = encodeURIComponent(
+  'Olá! Quero saber como comprar um produto da Bellamama Cosméticos ou a camiseta da Rede de Olho no Câncer para participar da raspadinha da Caminhada FISIOT por Elas.'
+);
 
 export default function HomePage() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -406,6 +409,46 @@ export default function HomePage() {
               loading="eager"
             />
           </div>
+        </div>
+      </section>
+
+      <section className="commercial-section" id="como-participar">
+        <div className="commercial-inner">
+          <span className="eyebrow">Outra forma de participar</span>
+          <h2>Cada compra também pode liberar sua raspadinha</h2>
+          <p className="commercial-lead">
+            A <strong>Bellamama Cosméticos</strong> é a mantenedora por trás das vendas de cosméticos ligadas a
+            esta iniciativa da Caminhada FISIOT por Elas.
+          </p>
+          <div className="commercial-cards">
+            <div className="commercial-card">
+              <img src="/assets/logo-bellamama.jpg" alt="Bellamama Cosméticos" />
+              <p className="commercial-rule">
+                “Compre um produto da Bellamama Cosméticos e ganhe uma raspadinha.”
+              </p>
+            </div>
+            <div className="commercial-card">
+              <img src="/assets/logo-rede-olho-cancer.jpg" alt="Rede de Olho no Câncer" />
+              <p className="commercial-rule">
+                “Compre sua camiseta da Rede de Olho no Câncer e ganhe uma raspadinha.”
+              </p>
+            </div>
+          </div>
+          <p className="commercial-note">
+            São formas de apoiar e participar da iniciativa — não é doação. Para saber como comprar, fale
+            diretamente com a organização pelo WhatsApp.
+          </p>
+          <a
+            className="btn-solid commercial-cta"
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_COMMERCIAL_TEXT}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg viewBox="0 0 32 32" fill="currentColor">
+              <path d="M16.02 2.67C8.65 2.67 2.67 8.65 2.67 16.02c0 2.6.73 5.03 2 7.1L2.67 29.33l6.4-1.98a13.3 13.3 0 0 0 6.95 1.95c7.37 0 13.35-5.98 13.35-13.35S23.39 2.67 16.02 2.67z" />
+            </svg>
+            Quero comprar e participar
+          </a>
         </div>
       </section>
 
